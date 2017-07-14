@@ -55,7 +55,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/kops/master/addons
 # Setup Heapster
 kubectl create -f https://raw.githubusercontent.com/kubernetes/kops/master/addons/monitoring-standalone/v1.6.0.yaml
 vi heapster-rbac.yaml
-	PASTE THE FOLLOWING CONTENT:
+	# PASTE THE FOLLOWING CONTENT:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
