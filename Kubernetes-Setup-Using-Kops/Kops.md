@@ -91,6 +91,7 @@ kubectl apply -f heapster-rbac.yaml
 # The most important thing in this setup is to create the DNS name so do it carefully
 
 These are the few steps that I followed during creation of the DNS name:
+
 1.Take a DNS name from the third party like Godaddy
 
 2.Make the entries of the AWS nameservers(NS) with that DNS name
