@@ -16,6 +16,11 @@ aws configure
 
 (Now we need to have the AccessKeyId and SecretKeyAccess of the AWS Iam Account)
 
+# Create the env vars to save the AWS credentials on the machine
+export AWS_ACCESS_KEY_ID=AKIAJTN5PXRRW7WIFMGQ
+
+export AWS_SECRET_ACCESS_KEY=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
+
 # Create and then list a new S3 bucket
 aws s3 mb s3://cluster-1.k8s.tech-force-one.com
 
