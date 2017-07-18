@@ -17,16 +17,16 @@ aws configure
 (Now we need to have the AccessKeyId and SecretKeyAccess of the AWS Iam Account)
 
 # Create the env vars to save the AWS credentials on the machine
-export AWS_ACCESS_KEY_ID=AKIAJTN5PXRRW7WIFMGQ
+export AWS_ACCESS_KEY_ID=<ID>
 
-export AWS_SECRET_ACCESS_KEY=onxfLy7QR2GQti58SoHLqsmebuWTWpV18iO0H2Q+
+export AWS_SECRET_ACCESS_KEY=<AccessKey>
 
 # Create and then list a new S3 bucket
-aws s3 mb s3://cluster-1.k8s.tech-force-one.com
+aws s3 mb s3://<s3-bucket-name>
 
 aws s3 ls | grep k8s
 
-export KOPS_STATE_STORE=s3://cluster-1.k8s.tech-force-one.com
+export KOPS_STATE_STORE=s3://<s3-bucket-name>
 
 
 # Generate the public key of the machine through which we need to access the cluster
@@ -53,11 +53,11 @@ kops create cluster --zones=<zone-name> <cluster name or DNS name>
 
 
 # Check the cluster info before the final step
-kops edit cluster www.decurtiscorp.com
+kops edit cluster <name-of-the-cluster>
 
 
 # Final step
-kops update cluster www.decurtiscorp.com --yes
+kops update cluster <cluster-name> --yes
 
 
 # Check the cluster info
