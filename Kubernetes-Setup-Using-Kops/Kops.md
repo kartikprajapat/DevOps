@@ -73,20 +73,20 @@ vi heapster-rbac.yaml
 
 	# PASTE THE FOLLOWING CONTENT:
     
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: kubernetes-dashboard
-  labels:
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: ClusterRoleBinding
+    metadata:
+    name: kubernetes-dashboard
+    labels:
     k8s-app: kubernetes-dashboard
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-- kind: ServiceAccount
-  name: kubernetes-dashboard
-  namespace: kube-system
+    roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: cluster-admin
+    subjects:
+    - kind: ServiceAccount
+    name: kubernetes-dashboard
+    namespace: kube-system
 
 kubectl apply -f heapster-rbac.yaml
 
@@ -112,3 +112,8 @@ http://kubecloud.io/setup-ha-k8s-kops/
 
 https://kubernetes.io/docs/getting-started-guides/kops/
 
+# If we have made some changes in the cluster then we need to update it
+kops rolling-update cluster <cluster-name>
+
+  After varifying:
+  kops rolling-update cluster <cluster-name> --yes
