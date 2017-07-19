@@ -117,3 +117,7 @@ kops rolling-update cluster <cluster-name>
 
   After varifying:
   kops rolling-update cluster <cluster-name> --yes
+  
+  
+# If we want to change the machine type of the nodes or master then
+kops edit ig nodes --name=www.decurtiscorp.com --state=${KOPS_STATE_STORE}
