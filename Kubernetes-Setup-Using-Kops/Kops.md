@@ -28,6 +28,9 @@ aws s3 ls | grep k8s
 
 export KOPS_STATE_STORE=s3://<s3-bucket-name>
 
+# To check the nameserver pointing the DNS name
+
+   dig www.decurtiscorp.com NS
 
 # Generate the public key of the machine through which we need to access the cluster
 ssh-keygen -t rsa
@@ -49,8 +52,7 @@ kops create secret --name <name of the cluster or the DNS name> sshpublickey adm
 
 
 # Now create the cluster
-kops create cluster --zones=<zone-name> <cluster name or DNS name>
-
+kops create cluster --zones=us-east-1a --dns-zone=www.decurtiscorp.com --node-size=t2.xlarge --master-size=t2.xlarge --topology private --networking weave --vpc=vpc-2e3ceb57 www.decurtiscorp.com
 
 # Check the cluster info before the final step
 kops edit cluster <name-of-the-cluster>
@@ -65,7 +67,17 @@ kubectl cluster-info
 
 
 # Create the dashboard
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/kops/master/addons/kubernetes-dashboard/v1.6.1.yaml
+
+   kubectl run kubernetes-dashboard --image=gcr.io/google_containers/kubernetes-dashboard-amd64:v1.6.1 --namespace=kube-system
+   kubectl expose deployment kubernetes-dashboard --name=kubernetes-dashboard --namespace=kube-system
+   
+                                    OR
+
+   kubectl apply -f https://raw.githubusercontent.com/kubernetes/kops/master/addons/kubernetes-dashboard/v1.6.1.yaml
+   
+# To see id password of dashboard
+
+`   kubectl config view --minify
 
 # Setup Heapster
 kubectl create -f https://raw.githubusercontent.com/kubernetes/kops/master/addons/monitoring-standalone/v1.6.0.yaml
@@ -91,6 +103,9 @@ vi heapster-rbac.yaml
 kubectl apply -f heapster-rbac.yaml
 
 
+# Delete the cluster
+   
+   kops delete cluster <cluster-name> --yes
 
 
 # The most important thing in this setup is to create the DNS name so do it carefully
@@ -121,3 +136,5 @@ kops rolling-update cluster <cluster-name>
   
 # If we want to change the machine type of the nodes or master then
 kops edit ig nodes --name=www.decurtiscorp.com --state=${KOPS_STATE_STORE}
+   Edit the types of nodes or something else (whatever you want) and save the file
+   After saving file fire rolling-update command,changes will be saved.
