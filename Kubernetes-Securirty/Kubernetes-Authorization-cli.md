@@ -34,7 +34,7 @@ cat jakub.csr | base64 | tr -d '\n'
 
 kubectl certificate approve user-request-japs
 
-
+"............BELOW COMMAND IS GIVEN WRONG IN THE VIDEO.....PLZ FOLLOW THIS ONE..........."
 kubectl get csr user-request-japs --output=jsonpath={.status.certificate} | base64 -d > japs.crt
 
 # Create new config file
