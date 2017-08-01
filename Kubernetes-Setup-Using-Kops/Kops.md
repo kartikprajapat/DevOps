@@ -138,3 +138,8 @@ kops rolling-update cluster <cluster-name>
 kops edit ig nodes --name=www.decurtiscorp.com --state=${KOPS_STATE_STORE}
    Edit the types of nodes or something else (whatever you want) and save the file
    After saving file fire rolling-update command,changes will be saved.
+   
+   
+# For kops setup- related to subnets and all
+
+https://github.com/kubernetes/kops/issues/1282
