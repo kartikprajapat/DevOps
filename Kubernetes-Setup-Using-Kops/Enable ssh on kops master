@@ -2,7 +2,6 @@ ssh-add ~/.ssh/key
 #Here key can be id_rsa or something else depends upon the name we had given previously.
 
 # TO varify that whether the ssh is enabled or not
-
 ssh-add -l
 
 # ssh to the master
