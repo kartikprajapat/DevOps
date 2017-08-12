@@ -65,7 +65,7 @@ kops update cluster <cluster-name> --yes
 # Check the cluster info
 kubectl cluster-info
 
-< Here we need to specify the subnets carefully otherwise it will create the new subnets >
+                      Here we need to specify the subnets carefully otherwise it will create the new subnets 
 
 # Create the dashboard
 
