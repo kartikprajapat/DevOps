@@ -1,0 +1,84 @@
+// Docker compose script to setup new qc environment
+
+
+SSH site : admindss@172.26.248.114:22
+Command
+sudo rm -rf /etc/filebeat
+sudo mkdir /etc/filebeat
+sudo chmod 777 /etc/filebeat
+sudo sshpass -p India*99 scp adminjnk@172.26.248.150:$WORKSPACE/monitoring/filebeat/filebeat.yml /etc/filebeat/
+sed -i 's/logstash-url/172.26.248.19:5044/g' /etc/filebeat/filebeat.yml
+
+sudo rm -rf /etc/config-server
+sudo mkdir /etc/config-server
+sudo chmod 777  /etc/config-server
+sudo sshpass -p India*99 rsync -ar --include="*-qc.yml" --exclude="*.yml" adminjnk@172.26.248.150:$WORKSPACE/property/properties /etc/config-server
+cd /etc/config-server/properties
+for f in *-qc.yml*; do sudo mv "$f" $(echo "$f" | sed 's/-qc.yml/.yml/g'); done
+for subdir in *;do for FILE in $subdir/*-qc.yml; do sudo mv  "$FILE" $(echo "$FILE" | sed 's/-qc.yml/.yml/g'); done; done
+
+
+SSH site : admindss@172.26.248.114:22
+Command
+sudo rm -rf /etc/docker-compose
+sudo mkdir /etc/docker-compose
+sudo chmod 777  /etc/docker-compose
+sudo sshpass -p India*99 scp -r adminjnk@172.26.248.150:$WORKSPACE/infra-services /etc/docker-compose
+sudo sshpass -p India*99 scp -r adminjnk@172.26.248.150:$WORKSPACE/.env /etc/docker-compose/infra-services
+sudo sshpass -p India*99 scp -r adminjnk@172.26.248.150:$WORKSPACE/infra-core-service /etc/docker-compose
+sudo sshpass -p India*99 scp -r adminjnk@172.26.248.150:$WORKSPACE/.env /etc/docker-compose/infra-core-service
+cd /etc/docker-compose/infra-services
+sudo docker-compose pull
+sudo docker-compose up -d --build --force-recreate
+
+cd /etc/docker-compose/infra-core-service
+sudo docker-compose pull
+sudo docker-compose up -d --build –force-recreate
+
+
+SSH site : admindss@172.26.248.81:22
+Command
+sudo rm -rf /etc/filebeat
+sudo mkdir /etc/filebeat
+sudo chmod 777 /etc/filebeat
+sudo sshpass -p India*99 scp adminjnk@172.26.248.150:$WORKSPACE/monitoring/filebeat/filebeat.yml /etc/filebeat/
+sed -i 's/logstash-url/172.26.248.19:5044/g' /etc/filebeat/filebeat.yml
+
+sudo rm -rf /etc/docker-compose
+sudo mkdir /etc/docker-compose
+sudo chmod 777  /etc/docker-compose
+sudo sshpass -p India*99 scp -r adminjnk@172.26.248.150:$WORKSPACE/core-services /etc/docker-compose
+sudo sshpass -p India*99 scp -r adminjnk@172.26.248.150:$WORKSPACE/.env /etc/docker-compose/core-services
+cd /etc/docker-compose/core-services
+sudo docker-compose pull
+sudo docker-compose up -d   --build –force-recreate
+
+
+SSH site : admindss@172.26.248.107:22
+Command
+sudo rm -rf /etc/filebeat
+sudo mkdir /etc/filebeat
+sudo chmod 777 /etc/filebeat
+sudo sshpass -p India*99 scp adminjnk@172.26.248.150:$WORKSPACE/monitoring/filebeat/filebeat.yml /etc/filebeat/
+sed -i 's/logstash-url/172.26.248.19:5044/g' /etc/filebeat/filebeat.yml
+
+sudo rm -rf /etc/docker-compose
+sudo mkdir /etc/docker-compose
+sudo chmod 777  /etc/docker-compose
+sudo sshpass -p India*99 scp -r adminjnk@172.26.248.150:$WORKSPACE/vas-services /etc/docker-compose
+sudo sshpass -p India*99 scp -r adminjnk@172.26.248.150:$WORKSPACE/.env /etc/docker-compose/vas-services
+cd /etc/docker-compose/vas-services
+sudo docker-compose pull
+sudo docker-compose up -d --build –force-recreate
+
+
+SSH site : admindss@172.26.248.19:22
+Command
+sudo rm -rf /etc/docker-compose
+sudo mkdir /etc/docker-compose
+sudo chmod 777  /etc/docker-compose
+sudo sshpass -p India*99 scp -r adminjnk@172.26.248.150:$WORKSPACE/.env /etc/docker-compose
+sudo sshpass -p India*99 scp -r adminjnk@172.26.248.150:$WORKSPACE/monitoring/docker-compose.yml /etc/docker-compose
+cd /etc/docker-compose
+sudo docker-compose pull
+sudo docker-compose up -d --build --force-recreate
