@@ -13,3 +13,6 @@ ssh-add -l
 
 # ssh to the master
 ssh admin@<ip of master>
+
+# Imp link
+https://stackoverflow.com/questions/17846529/could-not-open-a-connection-to-your-authentication-agent
