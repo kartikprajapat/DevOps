@@ -1,0 +1,8 @@
+[Unit]
+Description=High-available, distributed message broker
+After=network.target
+[Service]
+#User=kafka
+ExecStart=/home/kafka/kafka_2.11-0.11.0.0/bin/kafka-server-start.sh /home/kafka/kafka_2.11-0.11.0.0/config/server.properties
+[Install]
+WantedBy=multi-user.target
