@@ -12,23 +12,8 @@ kops version
 
 
 
-
-
-
-
-
-
-
-
 # Demo cluster
-kops create cluster depositinternal.com --node-count 2 --zones us-east-1a,us-east-1b --master-zones us-east-1a --dns-zone depositinternal.com --dns private --topology private --networking weave --vpc=vpc-60740319
 
-kops edit cluster depositinternal.com
+kops create cluster cluster.k8s.local --zones us-east-1a --yes
 
-kops edit ig --name=depositinternal.com nodes
-
-kops update cluster depositinternal.com
-
-kops update cluster depositinternal.com --yes
-
-kubectl get nodes
+# Here the cluster name must end with .k8s.local otherwise the cluster will not follow the above approach.
