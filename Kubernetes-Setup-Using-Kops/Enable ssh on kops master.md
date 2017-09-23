@@ -14,5 +14,9 @@ ssh-add -l
 # ssh to the master
 ssh admin@<ip of master>
 
+or 
+
+ssh -i /root/.ssh/id_rsa ubuntu@<ip of master or node>
+
 # Imp link
 https://stackoverflow.com/questions/17846529/could-not-open-a-connection-to-your-authentication-agent
