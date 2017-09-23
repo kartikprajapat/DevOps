@@ -14,8 +14,9 @@ ssh-add -l
 # ssh to the master
 ssh admin@<ip of master>
 
-or 
+or
 
+If the nodes and the master has the ubuntu operating system then use this :
 ssh -i /root/.ssh/id_rsa ubuntu@<ip of master or node>
 
 # Imp link
