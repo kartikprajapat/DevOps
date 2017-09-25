@@ -49,5 +49,19 @@ scp cluster-dump.json ns.json dxp@<remote ip>:/home/ubuntu/
 kubectl create -f cluster-dump.json -f ns.json
 
 
+# Important Links
+
+https://coreos.com/kubernetes/docs/latest/cluster-dump-restore.html
+https://medium.com/@nnilesh7756/migration-of-kubernetes-cluster-deployment-state-55bfb945cffd
+https://github.com/kubernetes/kubernetes/issues/24229
+
+
+
+# ETCD slack reply:
+ 
+ jpbetz [10:40 PM] 
+@kamal_gupta_ Data such as endpoints and node names change between clusters. Instead of swapping an etcd, and all it's state, out from under an existing cluster to a new cluster, you should migrate the data.  `kubectl get --export` can be use to achieve this.  See https://coreos.com/kubernetes/docs/latest/cluster-dump-restore.html and https://medium.com/@nnilesh7756/migration-of-kubernetes-cluster-deployment-state-55bfb945cffd.  This has also been discussed on this thread: https://github.com/kubernetes/kubernetes/issues/24229
+
+
 
 # Maze karo
