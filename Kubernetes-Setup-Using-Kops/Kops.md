@@ -69,7 +69,7 @@ kubectl cluster-info
 
 # Create the dashboard
 
-   kubectl run kubernetes-dashboard --image=gcr.io/google_containers/kubernetes-dashboard-amd64:v1.6.1 --namespace=kube-system
+   kubectl run kubernetes-dashboard --image=gcr.io/google_containers/kubernetes-dashboard-amd64:v1.6.3 --namespace=kube-system
    kubectl expose deployment kubernetes-dashboard --name=kubernetes-dashboard --namespace=kube-system
    
                                     OR
