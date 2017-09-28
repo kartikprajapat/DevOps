@@ -14,7 +14,7 @@ sudo nano /etc/ssh/sshd_config
     PasswordAuthentication no
     PubkeyAuthentication yes
 
-kops create cluster dxp-shore.k8s.local --zones=us-east-1a --node-size=r4.xlarge --master-size=t2.xlarge --vpc=vpc-b558bacd
+kops create cluster dxp-shore.k8s.local --zones=us-east-1a --node-size=r4.xlarge --master-size=t2.xlarge --vpc=vpc-b558bacd --networking weave
 kops edit cluster dxp-shore.k8s.local
 kops edit ig --name=dxp-shore.k8s.local nodes
     image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-20160830
@@ -30,7 +30,6 @@ chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 kubectl get nodes
 kubectl run kubernetes-dashboard --port 80 --image gcr.io/google_containers/kubernetes-dashboard-amd64:v1.6.3 --namespace=kube-system
-kubectl expose kubernetes-dashboard --port 9090 --namespace=kube-system
 kubectl expose deployment kubernetes-dashboard --port 9090 --namespace=kube-system
 kubectl cluster-info
 kubectl config view
