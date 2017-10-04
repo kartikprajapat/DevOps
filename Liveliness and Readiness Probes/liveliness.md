@@ -11,3 +11,9 @@ This is used to check periodically that the service is running perfectly or not,
               periodSeconds: 10
 
         # Here the port is TargetPort on which the service is running.
+        
+        
+        
+# Important link
+
+<https://www.youtube.com/watch?v=xEdBSVaUtp4>
