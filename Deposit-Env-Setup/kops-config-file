@@ -1,0 +1,80 @@
+apiVersion: kops/v1alpha2
+kind: Cluster
+metadata:
+  creationTimestamp: 2017-09-13T08:03:08Z
+  name: depositinternal.k8s.local
+spec:
+  api:
+    loadBalancer:
+      type: Public
+  authorization:
+    alwaysAllow: {}
+  channel: stable
+  cloudProvider: aws
+  configBase: s3://depositinternal/depositinternal.k8s.local
+  etcdClusters:
+  - etcdMembers:
+    - instanceGroup: master-us-east-1a
+      name: a
+    - instanceGroup: master-us-east-1b
+      name: b
+    - instanceGroup: master-us-east-1c
+      name: c
+    name: main
+  - etcdMembers:
+    - instanceGroup: master-us-east-1a
+      name: a
+    - instanceGroup: master-us-east-1b
+      name: b
+    - instanceGroup: master-us-east-1c
+      name: c
+    name: events
+  kubernetesApiAccess:
+  - 0.0.0.0/0
+  kubernetesVersion: 1.6.7
+  masterInternalName: api.internal.depositinternal.k8s.local
+  masterPublicName: api.depositinternal.k8s.local
+  networkCIDR: 10.6.0.0/16
+  networkID: vpc-60740319
+  networking:
+    weave:
+      mtu: 8912
+  nonMasqueradeCIDR: 100.64.0.0/10
+  sshAccess:
+  - 0.0.0.0/0
+  subnets:
+  - cidr: 10.6.100.0/24
+    id: subnet-6d85ea41
+    name: us-east-1a
+    type: Private
+    zone: us-east-1a
+  - cidr: 10.6.101.0/24
+    id: subnet-4ead8c06
+    name: us-east-1b
+    type: Private
+    zone: us-east-1b
+  - cidr: 10.6.102.0/24
+    id: subnet-9bbce2c1
+    name: us-east-1c
+    type: Private
+    zone: us-east-1c
+  - cidr: 10.6.0.0/24
+    id: subnet-1685ea3a
+    name: utility-us-east-1a
+    type: Utility
+    zone: us-east-1a
+  - cidr: 10.6.1.0/24
+    id: subnet-a9b392e1
+    name: utility-us-east-1b
+    type: Utility
+    zone: us-east-1b
+  - cidr: 10.6.2.0/24
+    id: subnet-52bde308
+    name: utility-us-east-1c
+    type: Utility
+    zone: us-east-1c
+  topology:
+    dns:
+      type: Public
+    masters: private
+    nodes: private
