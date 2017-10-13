@@ -1,0 +1,295 @@
+apiVersion: v1
+data:
+  cpu-usage.rules: |
+    ALERT NodeCPUUsageExceededAlert
+      IF (100 - (avg by (instance) (irate(node_cpu{component="node-exporter",mode="idle"}[5m])) * 100)) > 75
+      FOR 2m
+      LABELS {
+        Team="NFR-Team"
+      }
+      ANNOTATIONS {
+        SUMMARY = "CPU usage of Node : {{ $labels.instance }} has exceeded permissible limit of 75% . The current value is {{ $value }} "
+      }
+  instance-availability.rules: |
+    ALERT InstanceDownAlert
+      IF up == 0
+      FOR 1m
+      LABELS { Team="NFR-Team" }
+      ANNOTATIONS {
+        summary = "Instance {{ $labels.instance }} down",
+        description = "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute.",
+      }
+  low-disk-space.rules: |
+    ALERT NodeLowDiskSpaceExceededAlert
+      IF ((node_filesystem_size{mountpoint="/"} - node_filesystem_free{mountpoint="/"} ) / node_filesystem_size{mountpoint="/"} * 100) > 75
+      FOR 2m
+      LABELS {
+        Team="NFR-Team"
+      }
+      ANNOTATIONS {
+         SUMMARY = "DiskSpace usage of Node : {{ $labels.instance }} has exceeded permissible limit of 75% . The current value is {{ $value }} "
+      }
+
+##### Number of Pods more than specified number under a replicaset #####
+
+  container-instance.rules: |
+    ALERT ComponentInstanceCountExceededAlert
+      IF (kube_replicaset_status_replicas{replicaset=~".*dxpguestservice.*"} or kube_replicaset_status_replicas{replicaset=~".*dxpguestpreference.*"} or kube_replicaset_status_replicas{replicaset=~".*boarding.*"} or kube_replicaset_status_replicas{replicaset=~".*child.*"} or kube_replicaset_status_replicas{replicaset=~".*embarkationadmin.*"} or kube_replicaset_status_replicas{replicaset=~".*embarkationservice.*"} or kube_replicaset_status_replicas{replicaset=~".*embarkationbff.*"}or kube_replicaset_status_replicas{replicaset=~".*rules.*"} or kube_replicaset_status_replicas{replicaset=~".*reporting.*"}) !=  1
+      FOR 3m
+      LABELS {
+        Team="Embarkation-Service-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Number of Current instances is not equal to the permissiable value 1 for replica set {{ $labels.replicaset }} .Current number of instances are {{ $value }}  "
+      }
+    ALERT ComponentInstanceCountExceededAlert
+      IF (drop_common_labels(kube_replicaset_status_replicas{replicaset=~".*dxpreservation.*"} or  kube_replicaset_status_replicas{replicaset=~".*deposit.*"})) !=  1
+      FOR 3m
+      LABELS {
+        Team="Reservation-Service-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Number of Current instances is not equal to the permissiable value 1 for replica set {{ $labels.replicaset }} .Current number of instances are {{ $value }}  "
+      }
+    ALERT ComponentInstanceCountExceededAlert
+      IF ((kube_replicaset_status_replicas{replicaset=~"dxpactivityreservation.*"} or kube_replicaset_status_replicas{replicaset=~"dxparsadmin.*"} or kube_replicaset_status_replicas{replicaset=~".*sales.*"} or kube_replicaset_status_replicas{replicaset=~".*vendor.*"} or kube_replicaset_status_replicas{replicaset=~".*dining.*"}) !=  1 or kube_replicaset_status_replicas{replicaset=~".*batchjobservice.*"} !=1 or kube_replicaset_status_replicas{replicaset=~".*seawareactivityreservationservice.*"} !=1 )
+      FOR 3m
+      LABELS {
+        Team="ARS-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Number of Current instances is not equal to the permissiable value 1 for replica set {{ $labels.replicaset }} .Current number of instances are {{ $value }}  "
+      }
+    ALERT ComponentInstanceCountExceededAlert
+      IF ((kube_replicaset_status_replicas{replicaset=~".*onlinecheckin.*"} or kube_replicaset_status_replicas{replicaset=~".*sailorframeworkbff.*"})) != 1
+      FOR 3m
+      LABELS {
+        Team="Onlinecheckin-Service-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Number of Current instances is not equal to the permissiable value 1 for replica set {{ $labels.replicaset }} .Current number of instances are {{ $value }}  "
+      }
+
+    ALERT ComponentInstanceCountExceededAlert
+      IF (kube_replicaset_status_replicas{replicaset=~".*dxpdaemonservice.*"}) != 1
+      FOR 3m
+      LABELS {
+        Team="Daemon-Service-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Number of Current instances is not equal to the permissiable value 1 for replica set {{ $labels.replicaset }} .Current number of instances are {{ $value }}  "
+      }
+
+    ALERT ComponentInstanceCountExceededAlert
+      IF (kube_replicaset_status_replicas{replicaset=~".*contentmanagementservice.*"}) != 1
+      FOR 3m
+      LABELS {
+        Team="CMS-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Number of Current instances is not equal to the permissiable value 1 for replica set {{ $labels.replicaset }} .Current number of instances are {{ $value }}  "
+      }
+
+    ALERT ComponentInstanceCountExceededAlert
+      IF (kube_replicaset_status_replicas{replicaset=~".*devicecontent.*"} !=1  or kube_replicaset_status_replicas{replicaset=~".*ship.*"} !=1 or kube_replicaset_status_replicas{replicaset=~".*componentcatalog.*"} !=1  or kube_replicaset_status_replicas{replicaset=~".*eventstore.*"} !=1 or  kube_replicaset_status_replicas{replicaset=~".*foodnbeverage.*"} !=1  or kube_replicaset_status_replicas{replicaset=~".*guestmultimedia.*"} !=1 or   kube_replicaset_status_replicas{replicaset=~".*idcrossreference.*"} !=1  or kube_replicaset_status_replicas{replicaset=~".*identityaccessmanagement.*"} !=2  or kube_replicaset_status_replicas{replicaset=~".*imageprocessing.*"} !=1 or kube_replicaset_status_replicas{replicaset=~".*incidentmanagement.*"} !=1 or  kube_replicaset_status_replicas{replicaset=~".*logistic.*"} !=1   or  kube_replicaset_status_replicas{replicaset=~".*luggage.*"} !=1  or  kube_replicaset_status_replicas{replicaset=~".*messaging.*"} !=1 or  kube_replicaset_status_replicas{replicaset=~".*cart.*"} !=1  or  kube_replicaset_status_replicas{replicaset=~".*multimediastorage.*"} !=2  or  kube_replicaset_status_replicas{replicaset=~".*ocr.*"} !=1   or  kube_replicaset_status_replicas{replicaset=~".*payment.*"}  !=2  or  kube_replicaset_status_replicas{replicaset=~".*personlocation.*"} !=1  or  kube_replicaset_status_replicas{replicaset=~".*referencedata.*"} !=1  or  kube_replicaset_status_replicas{replicaset=~".*personlocation.*"} !=1  or  kube_replicaset_status_replicas{replicaset=~".*socialnetworking.*"} !=1  or  kube_replicaset_status_replicas{replicaset=~".*teammember.*"} !=1  or  kube_replicaset_status_replicas{replicaset=~".*tenantmanager.*"} !=1  or  kube_replicaset_status_replicas{replicaset=~".*venue.*"} !=1  or  kube_replicaset_status_replicas{replicaset=~".*wearable.*"} !=1  or  kube_replicaset_status_replicas{replicaset=~".*visitor.*"} !=1 or kube_replicaset_status_replicas{replicaset=~".*deviceservice.*"} !=1)
+      FOR 3m
+      LABELS {
+        Team="Core-Services-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Number of Current instances is not equal to the permissiable value 1 for replica set {{ $labels.replicaset }} .Current number of instances are {{ $value }}  "
+      }
+
+#################################################################### When container restart #####
+
+  
+####################################################################  container memory (RAM)  greater than  600 MB
+  container-memory-usage.rules: |
+    ALERT ComponentMemoryLimitExceededAlert
+      IF ((container_memory_working_set_bytes{pod_name=~".*embarkationadmin.*"} or container_memory_working_set_bytes{pod_name=~".*dxpguestservice.*"} or container_memory_working_set_bytes{pod_name=~".*rules.*"} or  container_memory_working_set_bytes{pod_name=~".*reporting.*"})/(1024*1024)>3600 or (container_memory_working_set_bytes{pod_name=~".*dxpguestpreference.*"} or container_memory_working_set_bytes{pod_name=~".*boarding.*"} or container_memory_working_set_bytes{pod_name=~".*child.*"} or  container_memory_working_set_bytes{pod_name=~".*embarkationservice.*"} or container_memory_working_set_bytes{pod_name=~".*embarkationbff.*"})/(1024*1024)>1800)
+      FOR 3m
+      LABELS {
+        Team="Embarkation-Service-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = " Memory usage  of {{ $labels.container_name}} has exceeded above the permissiable value. The current memory usage of the service is {{ $value}}. The service is currently deployed on {{ $labels.instance}}"
+      }
+    ALERT ComponentMemoryLimitExceededAlert
+      IF ((container_memory_working_set_bytes{pod_name=~"dxpactivityreservationservice.*"} or container_memory_working_set_bytes{pod_name=~".*seawareactivityreservationservice.*"})/(1024*1024) > 1800  or  (container_memory_working_set_bytes{pod_name=~"dxpactivityreservationweb.*"}  or  container_memory_working_set_bytes{pod_name=~"dxpactivityreservationbff.*"} or container_memory_working_set_bytes{pod_name=~".*dining.*"} or container_memory_working_set_bytes{pod_name=~".*vendor.*"} or container_memory_working_set_bytes{pod_name=~"dxparsadmin.*"}or container_memory_working_set_bytes{pod_name=~".*batchjobservice.*"})/(1024*1024) > 700 or  container_memory_working_set_bytes{pod_name=~".*sales.*"}/(1024*1024) > 900)
+      FOR 3m
+      LABELS {
+        Team="ARS-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Memory usage  of {{ $labels.container_name}} has exceeded above the permissiable value. The current memory usage of the service is {{ $value}}. The service is currently deployed on {{ $labels.instance}}"
+      }
+    
+
+    ALERT ComponentMemoryLimitExceededAlert
+      IF (container_memory_working_set_bytes{pod_name=~".*dxpreservationservicevv.*"}/(1024*1024) > 1800  or  (container_memory_working_set_bytes{pod_name=~".*dxpreservationbff.*"} or container_memory_working_set_bytes{pod_name=~".*dxpreservationui.*"} or container_memory_working_set_bytes{pod_name=~".*deposit.*"})/(1024*1024) > 270)
+      FOR 3m
+      LABELS {
+        Team="Reservation-Service-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Memory usage  of {{ $labels.container_name}} has exceeded above the permissiable value. The current memory usage of the service is {{ $value}}. The service is currently deployed on {{ $labels.instance}}"
+      }
+    
+
+    ALERT ComponentMemoryLimitExceededAlert
+      IF ((container_memory_working_set_bytes{pod_name=~".*onlinecheckin.*"} or container_memory_working_set_bytes{pod_name=~".*sailorframeworkbff.*"})/(1024*1024) > 300)
+      FOR 3m
+      LABELS {
+        Team="Onlinecheckin-Service-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Memory usage  of {{ $labels.container_name}} has exceeded above the permissiable value. The current memory usage of the service is {{ $value}}. The service is currently deployed on {{ $labels.instance}}"
+      }
+
+     ALERT ComponentMemoryLimitExceededAlert
+      IF (container_memory_working_set_bytes{pod_name=~".*dxpdaemonservice.*"}/(1024*1024) > 700)
+      FOR 3m
+      LABELS {
+        Team="Daemon-Service-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Memory usage  of {{ $labels.container_name}} has exceeded above the permissiable value. The current memory usage of the service is {{ $value}}. The service is currently deployed on {{ $labels.instance}}"
+      }
+
+     ALERT ComponentMemoryLimitExceededAlert
+      IF (container_memory_working_set_bytes{pod_name=~".*contentmanagementservice.*"}/(1024*1024) > 700)
+      FOR 3m
+      LABELS {
+        Team="CMS-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Memory usage  of {{ $labels.container_name}} has exceeded above the permissiable value. The current memory usage of the service is {{ $value}}. The service is currently deployed on {{ $labels.instance}}"
+      }
+
+    ALERT ComponentMemoryLimitExceededAlert
+      IF((((container_memory_working_set_bytes{pod_name=~".*devicecontent.*"}   or container_memory_working_set_bytes{pod_name=~".*ship.*"}  or container_memory_working_set_bytes{pod_name=~".*componentcatalog.*"}   or container_memory_working_set_bytes{pod_name=~".*eventstore.*"}  or  container_memory_working_set_bytes{pod_name=~".*foodnbeverage.*"}   or container_memory_working_set_bytes{pod_name=~".*guestmultimedia.*"}  or   container_memory_working_set_bytes{pod_name=~".*idcrossreference.*"}   or container_memory_working_set_bytes{pod_name=~".*identityaccessmanagement.*"}   or container_memory_working_set_bytes{pod_name=~".*imageprocessing.*"}  or container_memory_working_set_bytes{pod_name=~".*incidentmanagement.*"}  or  container_memory_working_set_bytes{pod_name=~".*logistic.*"}    or  container_memory_working_set_bytes{pod_name=~".*luggage.*"}   or  container_memory_working_set_bytes{pod_name=~".*messaging.*"}  or  container_memory_working_set_bytes{pod_name=~".*cart.*"}      or  container_memory_working_set_bytes{pod_name=~".*ocr.*"}    or  container_memory_working_set_bytes{pod_name=~".*payment.*"}    or  container_memory_working_set_bytes{pod_name=~".*personlocation.*"}   or  container_memory_working_set_bytes{pod_name=~".*referencedata.*"}   or  container_memory_working_set_bytes{pod_name=~".*personlocation.*"}   or  container_memory_working_set_bytes{pod_name=~".*socialnetworking.*"}   or  container_memory_working_set_bytes{pod_name=~".*teammember.*"}   or  container_memory_working_set_bytes{pod_name=~".*tenantmanager.*"}   or  container_memory_working_set_bytes{pod_name=~".*venue.*"}   or  container_memory_working_set_bytes{pod_name=~".*wearable.*"}   or  container_memory_working_set_bytes{pod_name=~".*visitor.*"}  or container_memory_working_set_bytes{pod_name=~".*deviceservice.*"})/(1024*1024) >700 ) or  container_memory_working_set_bytes{pod_name=~".*multimediastorage.*"}/(1024*1024) >1024 ))
+      FOR 3m
+      LABELS {
+       Team="Core-Services-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Memory usage  of {{ $labels.container_name}} has exceeded above the permissiable value. The current memory usage of the service is {{ $value}}. The service is currently deployed on {{ $labels.instance}}"
+      }
+
+###################  when service down   ########################################################################
+  service-running-status.rules: |
+    ALERT ComponentDownAlert
+      IF ((kube_pod_container_status_running{pod=~".*dxpguestservice.*"} or kube_pod_container_status_running{pod=~".*dxpguestpreference.*"} or kube_pod_container_status_running{pod=~".*boarding.*"} or kube_pod_container_status_running{pod=~".*child.*"} or kube_pod_container_status_running{pod=~".*embarkationadmin.*"} or kube_pod_container_status_running{pod=~".*embarkationservice.*"} or kube_pod_container_status_running{pod=~".*embarkationbff.*"})) ==  0
+      FOR 3m
+      LABELS {
+        Team="Embarkation-Service-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Service {{ $labels.container}} is down. Pod name of service on kubernetes cluster is  {{ $labels.pod}} "
+      }
+    ALERT ComponentDownAlert
+      IF ((kube_pod_container_status_running{pod=~"dxpactivityreservation.*"} or kube_pod_container_status_running{pod=~".*sales.*"} or kube_pod_container_status_running{pod=~".*vendor.*"} or kube_pod_container_status_running{pod=~".*dining.*"})) ==  0
+      FOR 3m
+      LABELS {
+        Team="ARS-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Service {{ $labels.container}} is down. Pod name of service on kubernetes cluster is  {{ $labels.pod}} "
+      }
+
+    ALERT ComponentDownAlert
+      IF ((kube_pod_container_status_running{pod=~".*onlinecheckin.*"} or kube_pod_container_status_running{pod=~".*dxpsailor.*"})) == 0
+      FOR 3m
+      LABELS {
+        Team="Onlinecheckin-Service-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = " Service {{ $labels.container}} is down. Pod name of service on kubernetes cluster is  {{ $labels.pod}} "
+      }
+
+    ALERT ComponentDownAlert
+      IF ((kube_pod_container_status_running{pod=~".*dxpreservation.*"} or  kube_pod_container_status_running{pod=~".*deposit.*"})) ==  0
+      FOR 3m
+      LABELS {
+        Team="Reservation-Service-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Service {{ $labels.container}} is down. Pod name of service on kubernetes cluster is  {{ $labels.pod}} "
+      }
+
+     ALERT ComponentDownAlert
+      IF ((kube_pod_container_status_running{pod=~".*dxpdaemonservice..*"})) ==  0
+      FOR 3m
+      LABELS {
+        Team="Daemon-Service-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Service {{ $labels.container}} is down. Pod name of service on kubernetes cluster is  {{ $labels.pod}} "
+      }
+
+     ALERT ComponentDownAlert
+      IF ((kube_pod_container_status_running{pod=~".*contentmanagementservice.*"})) ==  0
+      FOR 3m
+      LABELS {
+        Team="CMS-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Service {{ $labels.container}} is down. Pod name of service on kubernetes cluster is  {{ $labels.pod}} "
+      }
+
+    ALERT ComponentDownAlert
+      IF ((kube_pod_container_status_running{pod=~".*devicecontent.*"}   or kube_pod_container_status_running{pod=~".*ship.*"}  or kube_pod_container_status_running{pod=~".*componentcatalog.*"}   or kube_pod_container_status_running{pod=~".*eventstore.*"}  or  kube_pod_container_status_running{pod=~".*foodnbeverage.*"}   or kube_pod_container_status_running{pod=~".*guestmultimedia.*"}  or   kube_pod_container_status_running{pod=~".*idcrossreference.*"}   or kube_pod_container_status_running{pod=~".*identityaccessmanagement.*"} or kube_pod_container_status_running{pod=~".*imageprocessing.*"}  or kube_pod_container_status_running{pod=~".*incidentmanagement.*"}  or  kube_pod_container_status_running{pod=~".*logistic.*"}    or  kube_pod_container_status_running{pod=~".*luggage.*"}   or  kube_pod_container_status_running{pod=~".*messaging.*"}  or  kube_pod_container_status_running{pod=~".*cart.*"}   or  kube_pod_container_status_running{pod=~".*multimediastorage.*"}   or  kube_pod_container_status_running{pod=~".*ocr.*"}    or  kube_pod_container_status_running{pod=~".*payment.*"}    or  kube_pod_container_status_running{pod=~".*personlocation.*"}   or  kube_pod_container_status_running{pod=~".*referencedata.*"}   or  kube_pod_container_status_running{pod=~".*personlocation.*"}   or  kube_pod_container_status_running{pod=~".*socialnetworking.*"}   or  kube_pod_container_status_running{pod=~".*teammember.*"}   or  kube_pod_container_status_running{pod=~".*tenantmanager.*"}   or  kube_pod_container_status_running{pod=~".*venue.*"}   or  kube_pod_container_status_running{pod=~".*wearable.*"}   or  kube_pod_container_status_running{pod=~".*visitor.*"})) ==  0
+      FOR 3m
+      LABELS {
+       Team="Core-Services-Team",
+        Env="VV-Shore-DEV"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Service {{ $labels.container}} is down. Pod name of service on kubernetes cluster is  {{ $labels.pod}}"
+      }
+##############################################################################################################
+  mem-usage.rules: |
+    ALERT NodeSwapUsageExceededAlert
+      IF (((node_memory_SwapTotal-node_memory_SwapFree)/node_memory_SwapTotal)*100) > 75
+      FOR 2m
+      LABELS {
+        Team="NFR-Team"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Swape Memory usage of Node : {{ $labels.instance }} has exceeded above the permissible limit of 75% . The current value is {{ $value }}. "
+      }
+
+    ALERT NodeMemoryUsageExceededAlert
+      IF (((node_memory_MemTotal-node_memory_MemFree-node_memory_Cached-node_memory_Buffers)/node_memory_MemTotal)*100) > 75
+      FOR 2m
+      LABELS {
+        Team="NFR-Team"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Memory usage of Node : {{ $labels.instance }} has exceeded  permissible limit of 75% . The current value is {{ $value }} "
+      }
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: prometheus-rules
+  namespace: monitoring
