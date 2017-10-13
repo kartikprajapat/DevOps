@@ -124,9 +124,9 @@ These are the few steps that I followed during creation of the DNS name:
 
 # I found the below links very useful to setup the kops
 
-http://kubecloud.io/setup-ha-k8s-kops/
+<http://kubecloud.io/setup-ha-k8s-kops/>
 
-https://kubernetes.io/docs/getting-started-guides/kops/
+<https://kubernetes.io/docs/getting-started-guides/kops/>
 
 # If we have made some changes in the cluster then we need to update it
 kops rolling-update cluster <cluster-name>
@@ -143,4 +143,4 @@ kops edit ig nodes --name=www.decurtiscorp.com --state=${KOPS_STATE_STORE}
    
 # For kops setup- related to subnets and all
 
-https://github.com/kubernetes/kops/issues/1282
+<https://github.com/kubernetes/kops/issues/1282>
