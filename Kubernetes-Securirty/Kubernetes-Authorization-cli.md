@@ -46,6 +46,6 @@ cp kubelet.conf /home/admindss/user-account/japs-user.conf
 
 # Rest steps are in video
 
-                                    https://www.youtube.com/watch?v=slUMVwRXlRo
-                                    https://www.linkedin.com/pulse/adding-users-quick-start-kubernetes-aws-jakub-scholz
+                                    <https://www.youtube.com/watch?v=slUMVwRXlRo>
+                                    <https://www.linkedin.com/pulse/adding-users-quick-start-kubernetes-aws-jakub-scholz>
 
