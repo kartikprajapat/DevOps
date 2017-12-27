@@ -1,0 +1,288 @@
+{
+    "Interface": ":4984",
+    "AdminInterface": "0.0.0.0:4985",
+    "log": [
+        "HTTP+"
+    ],
+    "Databases": {
+        "appdocstorenew": {
+            "server": "http://10.3.100.236:8091",
+            "pool": "default",
+            "bucket": "appdocstorenew",
+            "username": "appdocstorenew",
+            "password": "yellow*99",
+            "name": "appdocstorenew",
+            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+            "users": {
+                "GUEST": {
+                    "name": "",
+                    "all_channels": null,
+                    "disabled": true
+                },
+                "vvdevappdocstorenew": {
+                    "name": "vvdevappdocstorenew",
+                    "admin_channels": [
+                        "*"
+                    ],
+                    "all_channels": null,
+                    "password": "yellow*99"
+                }
+            },
+            "cache": {
+                "enable_star_channel": null,
+                "channel_cache_max_length": 100000,
+                "channel_cache_min_length": null,
+                "channel_cache_expiry": null
+            },
+            "rev_cache_size": 100000
+        },
+        "archival": {
+            "server": "http://10.3.100.236:8091",
+            "pool": "default",
+            "bucket": "archival",
+            "username": "archival",
+            "password": "yellow*99",
+            "name": "archival",
+            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+            "users": {
+                "GUEST": {
+                    "name": "",
+                    "all_channels": null,
+                    "disabled": true
+                },
+                "vvdev": {
+                    "name": "vvdev",
+                    "admin_channels": [
+                        "*"
+                    ],
+                    "all_channels": null,
+                    "password": "yellow*99"
+                }
+            },
+            "cache": {
+                "enable_star_channel": null,
+                "channel_cache_max_length": 100000,
+                "channel_cache_min_length": null,
+                "channel_cache_expiry": null
+            },
+            "rev_cache_size": 100000
+        },
+        "dxpawschat": {
+            "server": "http://10.3.100.236:8091",
+            "pool": "default",
+            "bucket": "dxpawschat",
+            "username": "dxpawschat",
+            "password": "yellow*99",
+            "name": "dxpawschat",
+            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+            "users": {
+                "GUEST": {
+                    "name": "",
+                    "all_channels": null,
+                    "disabled": true
+                },
+                "vvdev": {
+                    "name": "vvdev",
+                    "admin_channels": [
+                        "*"
+                    ],
+                    "all_channels": null,
+                    "password": "yellow*99"
+                }
+            },
+            "cache": {
+                "enable_star_channel": null,
+                "channel_cache_max_length": 100000,
+                "channel_cache_min_length": null,
+                "channel_cache_expiry": null
+            },
+            "rev_cache_size": 100000
+        },
+        "dxplogging": {
+            "server": "http://10.3.100.236:8091",
+            "pool": "default",
+            "bucket": "dxplogging",
+            "username": "dxplogging",
+            "password": "yellow*99",
+            "name": "dxplogging",
+            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+            "users": {
+                "GUEST": {
+                    "name": "",
+                    "all_channels": null,
+                    "disabled": true
+                },
+                "vvdev": {
+                    "name": "vvdev",
+                    "admin_channels": [
+                        "*"
+                    ],
+                    "all_channels": null,
+                    "password": "yellow*99"
+                }
+            },
+            "cache": {
+                "enable_star_channel": null,
+                "channel_cache_max_length": 100000,
+                "channel_cache_min_length": null,
+                "channel_cache_expiry": null
+            },
+            "rev_cache_size": 100000
+        },
+        "embarkationmav": {
+            "server": "http://10.3.100.236:8091",
+            "pool": "default",
+            "bucket": "embarkationmav",
+            "username": "embarkationmav",
+            "password": "yellow*99",
+            "name": "embarkationmav",
+            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+            "users": {
+                "GUEST": {
+                    "name": "",
+                    "all_channels": null,
+                    "disabled": true
+                },
+                "vvdev": {
+                    "name": "GUEST",
+                    "admin_channels": [
+                        "*"
+                    ],
+                    "all_channels": null,
+                    "password": "yellow*99"
+                }
+            },
+            "cache": {
+                "enable_star_channel": null,
+                "channel_cache_max_length": 100000,
+                "channel_cache_min_length": null,
+                "channel_cache_expiry": null
+            },
+            "rev_cache_size": 100000
+        },
+        "multimedia": {
+            "server": "http://10.3.100.236:8091",
+            "pool": "default",
+            "bucket": "multimedia",
+            "username": "multimedia",
+            "password": "yellow*99",
+            "name": "multimedia",
+            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+            "users": {
+                "GUEST": {
+                    "name": "",
+                    "all_channels": null,
+                    "disabled": true
+                },
+                "vvdev": {
+                    "name": "vvdev",
+                    "admin_channels": [
+                        "*"
+                    ],
+                    "all_channels": null,
+                    "password": "yellow*99"
+                }
+            },
+            "cache": {
+                "enable_star_channel": null,
+                "channel_cache_max_length": 100000,
+                "channel_cache_min_length": null,
+                "channel_cache_expiry": null
+            },
+            "rev_cache_size": 100000
+        },
+        "reporting": {
+            "server": "http://10.3.100.236:8091",
+            "pool": "default",
+            "bucket": "reporting",
+            "username": "reporting",
+            "password": "yellow*99",
+            "name": "reporting",
+            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+            "users": {
+                "GUEST": {
+                    "name": "",
+                    "all_channels": null,
+                    "disabled": true
+                },
+                "vvdev": {
+                    "name": "vvdev",
+                    "admin_channels": [
+                        "*"
+                    ],
+                    "all_channels": null,
+                    "password": "yellow*99"
+                }
+            },
+            "cache": {
+                "enable_star_channel": null,
+                "channel_cache_max_length": 100000,
+                "channel_cache_min_length": null,
+                "channel_cache_expiry": null
+            },
+            "rev_cache_size": 100000
+        },
+        "reportingsync": {
+            "server": "http://10.3.100.236:8091",
+            "pool": "default",
+            "bucket": "reportingsync",
+            "username": "reportingsync",
+            "password": "yellow*99",
+            "name": "reportingsync",
+            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+            "users": {
+                "GUEST": {
+                    "name": "",
+                    "all_channels": null,
+                    "disabled": true
+                },
+                "vvdev": {
+                    "name": "GUEST",
+                    "admin_channels": [
+                        "*"
+                    ],
+                    "all_channels": null,
+                    "password": "yellow*99"
+                }
+            },
+            "cache": {
+                "enable_star_channel": null,
+                "channel_cache_max_length": 100000,
+                "channel_cache_min_length": null,
+                "channel_cache_expiry": null
+            },
+            "rev_cache_size": 100000
+        },
+        "sailorframework": {
+            "server": "http://10.3.100.236:8091",
+            "pool": "default",
+            "bucket": "sailorframework",
+            "username": "sailorframework",
+            "password": "yellow*99",
+            "name": "sailorframework",
+            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+            "users": {
+                "GUEST": {
+                    "name": "",
+                    "all_channels": null,
+                    "disabled": true
+                },
+                "vvdev": {
+                    "name": "vvdev",
+                    "admin_channels": [
+                        "*"
+                    ],
+                    "all_channels": null,
+                    "password": "yellow*99"
+                }
+            },
+            "cache": {
+                "enable_star_channel": null,
+                "channel_cache_max_length": 100000,
+                "channel_cache_min_length": null,
+                "channel_cache_expiry": null
+            },
+            "rev_cache_size": 100000
+        }
+    }
+}
