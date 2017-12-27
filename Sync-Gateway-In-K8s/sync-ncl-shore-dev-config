@@ -1,0 +1,393 @@
+{
+  "Interface": ":4984",
+  "AdminInterface": "0.0.0.0:4985",
+  "log": [
+    "HTTP+"
+  ],
+  "Logging": {
+    "default": {
+      "LogFilePath": "/home/sync_gateway/logs/sync_gateway_error.log",
+      "LogKeys": [
+        "HTTP+",
+        "HTTP"
+      ],
+      "LogLevel": "debug",
+      "Rotation": {
+        "MaxSize": 10,
+        "MaxAge": 5,
+        "MaxBackups": 5,
+        "LocalTime": true
+      }
+    }
+  },
+  "MaxFileDescriptors": 50000,
+  "Databases": {
+    "appdocstore": {
+      "server": "http://34.235.78.101:8091",
+      "pool": "default",
+      "bucket": "appdocstore",
+      "username": "appdocstore",
+      "password": "yellow*99",
+      "name": "appdocstore",
+      "sync": "function(doc)\n      {\n        channel(doc.channels);\n      }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "admin_channels": [
+            " * "
+          ],
+          "all_channels": null,
+          "disabled": true
+        },
+        "decurtis": {
+          "name": "decurtis",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "pass"
+        }
+      },
+      "cache": {
+        "enable_star_channel": null,
+        "channel_cache_max_length": 100000,
+        "channel_cache_min_length": null,
+        "channel_cache_expiry": null
+      },
+      "rev_cache_size": 100000
+    },
+    "appdocstorenew": {
+      "server": "http://34.235.78.101:8091",
+      "pool": "default",
+      "bucket": "appdocstorenew",
+      "username": "appdocstorenew",
+      "password": "yellow*99",
+      "name": "appdocstorenew",
+      "sync": "function(doc)\n      {\n        channel(doc.channels);\n      }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "admin_channels": [
+            " * "
+          ],
+          "all_channels": null,
+          "disabled": true
+        },
+        "decurtisnew": {
+          "name": "decurtisnew",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "yellow*99"
+        }
+      },
+      "cache": {
+        "enable_star_channel": null,
+        "channel_cache_max_length": 100000,
+        "channel_cache_min_length": null,
+        "channel_cache_expiry": null
+      },
+      "rev_cache_size": 100000
+    },
+    "appdocstorespms": {
+      "server": "http://34.235.78.101:8091",
+      "pool": "default",
+      "bucket": "appdocstorespms",
+      "username": "appdocstorespms",
+      "password": "yellow*99",
+      "name": "appdocstorespms",
+      "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "all_channels": null,
+          "disabled": true
+        },
+        "ncldevappdocstorespms": {
+          "name": "ncldevappdocstorespms",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "yellow*99"
+        }
+      },
+      "rev_cache_size": 100000
+    },
+    "appdocstorespms_v1": {
+      "server": "http://34.235.78.101:8091",
+      "pool": "default",
+      "bucket": "appdocstorespms_v1",
+      "username": "appdocstorespms_v1",
+      "password": "yellow*99",
+      "name": "appdocstorespms_v1",
+      "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "all_channels": null,
+          "disabled": true
+        },
+        "ncldevappdocstorespms_v1": {
+          "name": "ncldevappdocstorespms_v1",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "yellow*99"
+        }
+      },
+      "rev_cache_size": 100000
+    },
+    "dxpawschat": {
+      "server": "http://34.235.78.101:8091",
+      "pool": "default",
+      "bucket": "dxpawschat",
+      "username": "dxpawschat",
+      "password": "yellow*99",
+      "name": "dxpawschat",
+      "sync": "function(doc)\n      {\n        channel(doc.channels);\n      }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "all_channels": null,
+          "disabled": true
+        },
+        "decurtis": {
+          "name": "decurtis",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "pass"
+        }
+      },
+      "cache": {
+        "enable_star_channel": null,
+        "channel_cache_max_length": 100000,
+        "channel_cache_min_length": null,
+        "channel_cache_expiry": null
+      },
+      "rev_cache_size": 100000
+    },
+    "dxplogging": {
+      "server": "http://34.235.78.101:8091",
+      "pool": "default",
+      "bucket": "dxplogging",
+      "username": "dxplogging",
+      "password": "yellow*99",
+      "name": "dxplogging",
+      "sync": "function(doc)\n      {\n        channel(doc.channels);\n      }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "admin_channels": [
+            " * "
+          ],
+          "all_channels": null,
+          "disabled": true
+        },
+        "decurtis": {
+          "name": "GUEST",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "pass"
+        }
+      }
+    },
+    "multimedia": {
+      "server": "http://34.235.78.101:8091",
+      "pool": "default",
+      "bucket": "multimedia",
+      "username": "multimedia",
+      "password": "yellow*99",
+      "name": "multimedia",
+      "sync": "function(doc)\n      {\n        channel(doc.channels);\n      }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "admin_channels": [
+            " * "
+          ],
+          "all_channels": null,
+          "disabled": true
+        },
+        "decurtis": {
+          "name": "decurtis",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "pass"
+        }
+      },
+      "cache": {
+        "enable_star_channel": null,
+        "channel_cache_max_length": 100000,
+        "channel_cache_min_length": null,
+        "channel_cache_expiry": null
+      },
+      "rev_cache_size": 100000
+    },
+    "ncldevappdocstore_v1": {
+      "server": "http://34.235.78.101:8091",
+      "pool": "default",
+      "bucket": "ncldevappdocstore_v1",
+      "username": "ncldevappdocstore_v1",
+      "password": "yellow*99",
+      "name": "ncldevappdocstore_v1",
+      "sync": "function(doc)\n      {\n        channel(doc.channels);\n      }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "admin_channels": [
+            " * "
+          ],
+          "all_channels": null,
+          "disabled": true
+        },
+        "ncldevappdocstore_v1": {
+          "name": "ncldevappdocstore_v1",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "Nc1Dem0*04"
+        }
+      },
+      "cache": {
+        "enable_star_channel": null,
+        "channel_cache_max_length": 100000,
+        "channel_cache_min_length": null,
+        "channel_cache_expiry": null
+      },
+      "rev_cache_size": 100000
+    },
+    "reporting": {
+      "server": "http://34.235.78.101:8091",
+      "pool": "default",
+      "bucket": "reporting",
+      "username": "reporting",
+      "password": "yellow*99",
+      "name": "reporting",
+      "sync": "function(doc)\n      {\n        channel(doc.channels);\n      }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "admin_channels": [
+            " * "
+          ],
+          "all_channels": null,
+          "disabled": true
+        },
+        "decurtis": {
+          "name": "decurtis",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "pass"
+        }
+      },
+      "cache": {
+        "enable_star_channel": null,
+        "channel_cache_max_length": 100000,
+        "channel_cache_min_length": null,
+        "channel_cache_expiry": null
+      },
+      "rev_cache_size": 100000
+    },
+    "sailorframework": {
+      "server": "http://34.235.78.101:8091",
+      "pool": "default",
+      "bucket": "sailorframework",
+      "username": "sailorframework",
+      "password": "yellow*99",
+      "name": "sailorframework",
+      "sync": "function(doc)\n      {\n        channel(doc.channels);\n      }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "all_channels": null,
+          "disabled": true
+        },
+        "decurtis": {
+          "name": "decurtis",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "pass"
+        }
+      },
+      "cache": {
+        "enable_star_channel": null,
+        "channel_cache_max_length": 100000,
+        "channel_cache_min_length": null,
+        "channel_cache_expiry": null
+      },
+      "rev_cache_size": 100000
+    }
+  },
+  "Replications": [
+    {
+      "source": "http://34.225.92.196:4985/sailorframework",
+      "target": "sailorframework",
+      "continuous": true,
+      "create_target": false,
+      "doc_ids": null,
+      "filter": "",
+      "proxy": "",
+      "query_params": null,
+      "cancel": false,
+      "async": false,
+      "changes_feed_limit": 1000,
+      "replication_id": "ncl_dev_ship_sailorframework_shore"
+    },
+    {
+      "source": "http://34.225.92.196:4985/dxpawschat",
+      "target": "dxpawschat",
+      "continuous": true,
+      "create_target": false,
+      "doc_ids": null,
+      "filter": "",
+      "proxy": "",
+      "query_params": null,
+      "cancel": false,
+      "async": false,
+      "changes_feed_limit": 1000,
+      "replication_id": "ncl_dev_ship_dxpawschat_shore"
+    },
+    {
+      "source": "http://34.225.92.196:4985/ncldevappdocstore_v1",
+      "target": "ncldevappdocstore_v1",
+      "continuous": true,
+      "create_target": false,
+      "doc_ids": null,
+      "filter": "",
+      "proxy": "",
+      "query_params": null,
+      "cancel": false,
+      "async": false,
+      "changes_feed_limit": 1000,
+      "replication_id": "ncl_dev_ship_ncldevappdocstore_v1_shore"
+    },
+    {
+      "source": "http://34.225.92.196:4985/multimedia",
+      "target": "multimedia",
+      "continuous": true,
+      "create_target": false,
+      "doc_ids": null,
+      "filter": "",
+      "proxy": "",
+      "query_params": null,
+      "cancel": false,
+      "async": false,
+      "changes_feed_limit": 1000,
+      "replication_id": "ncl_dev_ship_multimedia_shore"
+    }
+  ]
+}
