@@ -275,3 +275,391 @@ data:
     # Change to DEBUG to enable audit log for the authorizer
     log4j.logger.kafka.authorizer.logger=WARN, authorizerAppender
     log4j.additivity.kafka.authorizer.logger=false
+    
+---
+# A headless service to create DNS records
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: broker
+  namespace: kafka
+spec:
+  ports:
+  - port: 9092
+  # [podname].broker.kafka.svc.cluster.local
+  clusterIP: None
+  selector:
+    app: kafka
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bootstrap
+  namespace: kafka
+spec:
+  ports:
+  - port: 9092
+  selector:
+    app: kafka
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: kafka
+  namespace: kafka
+spec:
+spec:
+  selector:
+    matchLabels:
+      app: kafka
+  serviceName: "broker"
+  replicas: 3
+#  updateStrategy:
+ #   type: OnDelete
+  template:
+    metadata:
+      labels:
+        app: kafka
+      annotations:
+    spec:
+      terminationGracePeriodSeconds: 30
+      initContainers:
+      - name: init-config
+        image: solsson/kafka-initutils@sha256:c98d7fb5e9365eab391a5dcd4230fc6e72caf929c60f29ff091e3b0215124713
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        command: ['/bin/bash', '/etc/kafka/init.sh']
+        volumeMounts:
+        - name: config
+          mountPath: /etc/kafka
+      affinity:
+       podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - kafka
+              topologyKey: "kubernetes.io/hostname"
+       podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+             - weight: 1
+               podAffinityTerm:
+                 labelSelector:
+                    matchExpressions:
+                      - key: "app"
+                        operator: In
+                        values:
+                        - zookeeper
+                 topologyKey: "kubernetes.io/hostname"
+       nodeAffinity:
+         requiredDuringSchedulingIgnoredDuringExecution:
+           nodeSelectorTerms:
+           - matchExpressions:
+             - key: Node
+               operator: In
+               values:
+               - Node-1
+               - Node-2
+               - Node-3
+
+
+      containers:
+      - name: broker
+        image: solsson/kafka:1.0.0@sha256:17fdf1637426f45c93c65826670542e36b9f3394ede1cb61885c6a4befa8f72d
+        env:
+        - name: KAFKA_LOG4J_OPTS
+          value: -Dlog4j.configuration=file:/etc/kafka/log4j.properties
+        - name: JMX_PORT
+          value: "5555"
+        ports:
+        - name: inside
+          containerPort: 9092
+        - name: outside
+          containerPort: 9094
+        - name: jmx
+          containerPort: 5555
+        command:
+        - ./bin/kafka-server-start.sh
+        - /etc/kafka/server.properties
+        - --override
+        -   zookeeper.connect=zookeeper:2181
+        - --override
+        -   log.retention.hours=-1
+        - --override
+        -   log.dirs=/var/lib/kafka/data/topics
+        - --override
+        -   auto.create.topics.enable=false
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+        readinessProbe:
+          tcpSocket:
+            port: 9092
+          timeoutSeconds: 1
+        volumeMounts:
+        - name: config
+          mountPath: /etc/kafka
+        - name: data
+          mountPath: /var/lib/kafka/data
+      volumes:
+      - name: config
+        configMap:
+          name: broker-config
+      - name: data
+        hostPath:
+          path: /var/lib/kafka/data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: schema
+  namespace: kafka
+spec:
+  ports:
+  - port: 8081
+  clusterIP: None
+  selector:
+    app: schema-registry
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: registry
+  namespace: kafka
+spec:
+  serviceName: "schema"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: schema-registry
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: schema-registry
+        image: confluentinc/cp-schema-registry:3.2.0@sha256:ae0a2021a7ac52bdb98dd760850a50d72747a62612f257be92b0698654bac70d
+        env:
+        - name: SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL
+          value: zookeeper:2181
+        - name: SCHEMA_REGISTRY_HOST_NAME
+          value: registry-0.schema.kafka.svc.cluster.local
+        - name: SCHEMA_REGISTRY_LISTENERS
+          value: http://0.0.0.0:8081
+        ports:
+        - containerPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rest
+  namespace: kafka
+spec:
+  ports:
+  - port: 8082
+  selector:
+    app: kafka-rest
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: rest
+  namespace: kafka
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-rest
+    spec:
+      containers:
+      - name: kafka-rest
+        image: confluentinc/cp-kafka-rest:3.2.0@sha256:82206b1609d84e30279688ed036b034c503feb35543637d930f3d95136296245
+        env:
+        - name: KAFKA_REST_ZOOKEEPER_CONNECT
+          value: zookeeper:2181
+        - name: KAFKA_REST_SCHEMA_REGISTRY_URL
+          value: registry-0.schema.kafka.svc.cluster.local
+        - name: KAFKA_REST_BOOTSTRAP_SERVERS
+          value: PLAINTEXT://kafka-0.broker.kafka.svc.cluster.local:9092,kafka-1.broker.kafka.svc.cluster.local:9092,kafka-2.broker.kafka.svc.cluster.local:9092
+        - name: KAFKA_REST_HOST_NAME
+          value: localhost
+        - name: KAFKA_REST_LISTENERS
+          value: http://0.0.0.0:8082
+        ports:
+        - containerPort: 8082
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-ui
+  namespace: kafka
+spec:
+  ports:
+  - port: 8000
+  selector:
+    app: kafka-topic-ui
+  type: NodePort
+
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: kafka-ui
+  namespace: kafka
+#  labels:
+ #   app: kafka-topic-ui
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-topic-ui
+    spec:
+      containers:
+      - name: kafka-topc-ui
+        image: landoop/kafka-topics-ui
+        env:
+        - name: KAFKA_REST_PROXY_URL
+          value: rest:8082
+        - name: PROXY
+          value: "true"
+        - name: KAFKA_REST_SCHEMA_REGISTRY_URL
+          value: registry-0.schema.kafka.svc.cluster.local
+        ports:
+        - containerPort: 8000
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: kafka-manager
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-manager
+  template:
+    metadata:
+      labels:
+        app: kafka-manager
+    spec:
+      containers:
+      - name: kafka-manager
+        image: solsson/kafka-manager@sha256:e07b5c50b02c761b3471ebb62ede88afc0625e325fe428316e32fec7f227ff9b
+        ports:
+        - containerPort: 80
+        env:
+        - name: ZK_HOSTS
+          value: zookeeper.kafka:2181
+        command:
+        - ./bin/kafka-manager
+        - -Dhttp.port=80
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: kafka-manager
+  namespace: kafka
+spec:
+  selector:
+    app: kafka-manager
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: NodePort
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: outside-0
+  namespace: kafka
+spec:
+  selector:
+    app: kafka
+    kafka-broker-id: "0"
+  ports:
+  - protocol: TCP
+    targetPort: 9094
+    port: 32400
+    nodePort: 32400
+  type: NodePort
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: outside-1
+  namespace: kafka
+spec:
+  selector:
+    app: kafka
+    kafka-broker-id: "1"
+  ports:
+  - protocol: TCP
+    targetPort: 9094
+    port: 32401
+    nodePort: 32401
+  type: NodePort
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: outside-2
+  namespace: kafka
+spec:
+  selector:
+    app: kafka
+    kafka-broker-id: "2"
+  ports:
+  - protocol: TCP
+    targetPort: 9094
+    port: 32402
+    nodePort: 32402
+  type: NodePort
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: node-reader
+  labels:
+    origin: github.com_Yolean_kubernetes-kafka
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - pods
+  verbs:
+  - get
+  - create
+  - patch
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: kafka-node-reader
+  labels:
+    origin: github.com_Yolean_kubernetes-kafka
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: node-reader
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: kafka
