@@ -1,288 +1,179 @@
 {
-    "Interface": ":4984",
-    "AdminInterface": "0.0.0.0:4985",
-    "log": [
-        "HTTP+"
-    ],
-    "Databases": {
-        "appdocstorenew": {
-            "server": "http://10.3.100.236:8091",
-            "pool": "default",
-            "bucket": "appdocstorenew",
-            "username": "appdocstorenew",
-            "password": "yellow*99",
-            "name": "appdocstorenew",
-            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
-            "users": {
-                "GUEST": {
-                    "name": "",
-                    "all_channels": null,
-                    "disabled": true
-                },
-                "vvdevappdocstorenew": {
-                    "name": "vvdevappdocstorenew",
-                    "admin_channels": [
-                        "*"
-                    ],
-                    "all_channels": null,
-                    "password": "yellow*99"
-                }
-            },
-            "cache": {
-                "enable_star_channel": null,
-                "channel_cache_max_length": 100000,
-                "channel_cache_min_length": null,
-                "channel_cache_expiry": null
-            },
-            "rev_cache_size": 100000
+  "Interface": ":4984",
+  "AdminInterface": "0.0.0.0:4985",
+  "log": [
+    "HTTP+"
+  ],
+  "Databases": {
+    "appdocstorespms_v3": {
+      "server": "http://192.100.1.87:8091",
+      "pool": "default",
+      "bucket": "appdocstorespms_v3",
+      "username": "appdocstorespms_v3",
+      "password": "yellow*99",
+      "name": "appdocstorespms_v3",
+      "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "all_channels": null,
+          "disabled": true
         },
-        "archival": {
-            "server": "http://10.3.100.236:8091",
-            "pool": "default",
-            "bucket": "archival",
-            "username": "archival",
-            "password": "yellow*99",
-            "name": "archival",
-            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
-            "users": {
-                "GUEST": {
-                    "name": "",
-                    "all_channels": null,
-                    "disabled": true
-                },
-                "vvdev": {
-                    "name": "vvdev",
-                    "admin_channels": [
-                        "*"
-                    ],
-                    "all_channels": null,
-                    "password": "yellow*99"
-                }
-            },
-            "cache": {
-                "enable_star_channel": null,
-                "channel_cache_max_length": 100000,
-                "channel_cache_min_length": null,
-                "channel_cache_expiry": null
-            },
-            "rev_cache_size": 100000
-        },
-        "dxpawschat": {
-            "server": "http://10.3.100.236:8091",
-            "pool": "default",
-            "bucket": "dxpawschat",
-            "username": "dxpawschat",
-            "password": "yellow*99",
-            "name": "dxpawschat",
-            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
-            "users": {
-                "GUEST": {
-                    "name": "",
-                    "all_channels": null,
-                    "disabled": true
-                },
-                "vvdev": {
-                    "name": "vvdev",
-                    "admin_channels": [
-                        "*"
-                    ],
-                    "all_channels": null,
-                    "password": "yellow*99"
-                }
-            },
-            "cache": {
-                "enable_star_channel": null,
-                "channel_cache_max_length": 100000,
-                "channel_cache_min_length": null,
-                "channel_cache_expiry": null
-            },
-            "rev_cache_size": 100000
-        },
-        "dxplogging": {
-            "server": "http://10.3.100.236:8091",
-            "pool": "default",
-            "bucket": "dxplogging",
-            "username": "dxplogging",
-            "password": "yellow*99",
-            "name": "dxplogging",
-            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
-            "users": {
-                "GUEST": {
-                    "name": "",
-                    "all_channels": null,
-                    "disabled": true
-                },
-                "vvdev": {
-                    "name": "vvdev",
-                    "admin_channels": [
-                        "*"
-                    ],
-                    "all_channels": null,
-                    "password": "yellow*99"
-                }
-            },
-            "cache": {
-                "enable_star_channel": null,
-                "channel_cache_max_length": 100000,
-                "channel_cache_min_length": null,
-                "channel_cache_expiry": null
-            },
-            "rev_cache_size": 100000
-        },
-        "embarkationmav": {
-            "server": "http://10.3.100.236:8091",
-            "pool": "default",
-            "bucket": "embarkationmav",
-            "username": "embarkationmav",
-            "password": "yellow*99",
-            "name": "embarkationmav",
-            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
-            "users": {
-                "GUEST": {
-                    "name": "",
-                    "all_channels": null,
-                    "disabled": true
-                },
-                "vvdev": {
-                    "name": "GUEST",
-                    "admin_channels": [
-                        "*"
-                    ],
-                    "all_channels": null,
-                    "password": "yellow*99"
-                }
-            },
-            "cache": {
-                "enable_star_channel": null,
-                "channel_cache_max_length": 100000,
-                "channel_cache_min_length": null,
-                "channel_cache_expiry": null
-            },
-            "rev_cache_size": 100000
-        },
-        "multimedia": {
-            "server": "http://10.3.100.236:8091",
-            "pool": "default",
-            "bucket": "multimedia",
-            "username": "multimedia",
-            "password": "yellow*99",
-            "name": "multimedia",
-            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
-            "users": {
-                "GUEST": {
-                    "name": "",
-                    "all_channels": null,
-                    "disabled": true
-                },
-                "vvdev": {
-                    "name": "vvdev",
-                    "admin_channels": [
-                        "*"
-                    ],
-                    "all_channels": null,
-                    "password": "yellow*99"
-                }
-            },
-            "cache": {
-                "enable_star_channel": null,
-                "channel_cache_max_length": 100000,
-                "channel_cache_min_length": null,
-                "channel_cache_expiry": null
-            },
-            "rev_cache_size": 100000
-        },
-        "reporting": {
-            "server": "http://10.3.100.236:8091",
-            "pool": "default",
-            "bucket": "reporting",
-            "username": "reporting",
-            "password": "yellow*99",
-            "name": "reporting",
-            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
-            "users": {
-                "GUEST": {
-                    "name": "",
-                    "all_channels": null,
-                    "disabled": true
-                },
-                "vvdev": {
-                    "name": "vvdev",
-                    "admin_channels": [
-                        "*"
-                    ],
-                    "all_channels": null,
-                    "password": "yellow*99"
-                }
-            },
-            "cache": {
-                "enable_star_channel": null,
-                "channel_cache_max_length": 100000,
-                "channel_cache_min_length": null,
-                "channel_cache_expiry": null
-            },
-            "rev_cache_size": 100000
-        },
-        "reportingsync": {
-            "server": "http://10.3.100.236:8091",
-            "pool": "default",
-            "bucket": "reportingsync",
-            "username": "reportingsync",
-            "password": "yellow*99",
-            "name": "reportingsync",
-            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
-            "users": {
-                "GUEST": {
-                    "name": "",
-                    "all_channels": null,
-                    "disabled": true
-                },
-                "vvdev": {
-                    "name": "GUEST",
-                    "admin_channels": [
-                        "*"
-                    ],
-                    "all_channels": null,
-                    "password": "yellow*99"
-                }
-            },
-            "cache": {
-                "enable_star_channel": null,
-                "channel_cache_max_length": 100000,
-                "channel_cache_min_length": null,
-                "channel_cache_expiry": null
-            },
-            "rev_cache_size": 100000
-        },
-        "sailorframework": {
-            "server": "http://10.3.100.236:8091",
-            "pool": "default",
-            "bucket": "sailorframework",
-            "username": "sailorframework",
-            "password": "yellow*99",
-            "name": "sailorframework",
-            "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
-            "users": {
-                "GUEST": {
-                    "name": "",
-                    "all_channels": null,
-                    "disabled": true
-                },
-                "vvdev": {
-                    "name": "vvdev",
-                    "admin_channels": [
-                        "*"
-                    ],
-                    "all_channels": null,
-                    "password": "yellow*99"
-                }
-            },
-            "cache": {
-                "enable_star_channel": null,
-                "channel_cache_max_length": 100000,
-                "channel_cache_min_length": null,
-                "channel_cache_expiry": null
-            },
-            "rev_cache_size": 100000
+        "ncldevappdocstorespms_v3": {
+          "name": "ncldevappdocstorespms_v3",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "yellow*99"
         }
+      },
+      "rev_cache_size": 500000,
+      "revs_limit": 15
+    },
+    "appdocstorespms_v5": {
+      "server": "http://192.100.1.87:8091",
+      "pool": "default",
+      "bucket": "appdocstorespms_v5",
+      "username": "appdocstorespms_v5",
+      "password": "yellow*99",
+      "name": "appdocstorespms_v5",
+      "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "all_channels": null,
+          "disabled": true
+        },
+        "ncldevappdocstorespms_v5": {
+          "name": "ncldevappdocstorespms_v5",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "yellow*99"
+        }
+      },
+      "rev_cache_size": 500000,
+      "revs_limit": 15
+    },
+    "dxplogging": {
+      "server": "http://192.100.1.87:8091",
+      "pool": "default",
+      "bucket": "dxplogging",
+      "username": "dxplogging",
+      "password": "yellow*99",
+      "name": "dxplogging",
+      "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "all_channels": null,
+          "disabled": true
+        },
+        "decurtis": {
+          "name": "decurtis",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "pass"
+        }
+      },
+      "revs_limit": 2
+    },
+    "monitor": {
+      "server": "http://192.100.1.87:8091",
+      "pool": "default",
+      "bucket": "monitor",
+      "username": "monitor",
+      "password": "yellow*99",
+      "name": "monitor",
+      "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "all_channels": null,
+          "disabled": true
+        },
+        "decurtis": {
+          "name": "decurtis",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "pass"
+        }
+      },
+      "revs_limit": 15
+    },
+    "multimedia": {
+      "server": "http://192.100.1.87:8091",
+      "pool": "default",
+      "bucket": "multimedia",
+      "username": "multimedia",
+      "password": "yellow*99",
+      "name": "multimedia",
+      "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "all_channels": null,
+          "disabled": true
+        },
+        "decurtis": {
+          "name": "decurtis",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "pass"
+        }
+      },
+      "rev_cache_size": 500000,
+      "revs_limit": 15
+    },
+    "reporting": {
+      "server": "http://192.100.1.87:8091",
+      "pool": "default",
+      "bucket": "reporting",
+      "username": "reporting",
+      "password": "yellow*99",
+      "name": "reporting",
+      "sync": "function(doc)\n      { channel(doc.channels); }\n      ",
+      "users": {
+        "GUEST": {
+          "name": "",
+          "all_channels": null,
+          "disabled": true
+        },
+        "decurtis": {
+          "name": "decurtis",
+          "admin_channels": [
+            "*"
+          ],
+          "all_channels": null,
+          "password": "pass"
+        }
+      },
+      "rev_cache_size": 500000,
+      "revs_limit": 15
     }
+  },
+  "Replications": [
+    {
+      "source": "http://172.31.20.90:4985/multimedia",
+      "target": "multimedia",
+      "continuous": true,
+      "create_target": false,
+      "doc_ids": null,
+      "filter": "",
+      "proxy": "",
+      "query_params": null,
+      "cancel": false,
+      "async": false,
+      "changes_feed_limit": 1000,
+      "replication_id": "ncl_shore_multimedia_ship"
+    }
+  ]
 }
