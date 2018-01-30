@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis-master
+  namespace: redis
   labels:
     app: redis
     role: master
@@ -20,6 +21,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis-slave
+  namespace: redis
   labels:
     app: redis
     role: slave
@@ -36,6 +38,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: redis-master
+  namespace: redis
 spec:
   replicas: 1
   template:
@@ -59,6 +62,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: redis-master
+  namespace: redis
 spec:
   replicas: 1
   template:
@@ -82,6 +86,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: redis-slave
+  namespace: redis
 spec:
   replicas: 2
   template:
@@ -108,7 +113,47 @@ spec:
           # value: env
         ports:
         - containerPort: 6379
-
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-commander
+  namespace: redis
+  labels:
+    name: redis-commander
+spec:
+  ports:
+    - port: 8081
+      targetPort: 8081
+  type: NodePort
+  selector:
+    app: redis-commander
+---
+apiVersion: apps/v1beta1 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  namespace: redis
+  name: redis-commander
+  labels:
+    app: redis-commander
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-commander
+  template:
+    metadata:
+      labels:
+        app: redis-commander
+    spec:
+      containers:
+      - name: redis-commander
+        image: rediscommander/redis-commander:latest
+        ports:
+        - containerPort: 8081
+        env:
+        - name: REDIS_HOSTS
+          value : redis-master
         
 
         
