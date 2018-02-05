@@ -6,6 +6,8 @@ This will show the specific versions and we can select the version and then down
 
     apt-get install kubeadm=1.7.0-00
     
+    eg : apt-get install -y kubelet=1.7.5-00 kubeadm=1.7.5-00 kubectl=1.7.5-00 kubernetes-cni
+    
 This will download the 1.7.0 version of kubeadm.
 
 
