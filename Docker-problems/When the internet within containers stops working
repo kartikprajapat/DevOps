@@ -1,0 +1,2 @@
+Run command ip route.
+This command is used to enable connection between the networks(Here docker network and host network)
