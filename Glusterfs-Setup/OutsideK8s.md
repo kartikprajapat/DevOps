@@ -51,3 +51,6 @@ ll /mnt/glusterfs/
 vi /mnt/glusterfs/file1
 
 vi /mnt/glusterfs/file2
+
+
+<https://www.itzgeek.com/how-tos/linux/ubuntu-how-tos/install-and-configure-glusterfs-on-ubuntu-16-04-debian-8.html>
