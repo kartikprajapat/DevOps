@@ -1,0 +1,6 @@
+logdazz [6 days ago]
+@Mr.Gupta as I have seem online, the most recommended approach is to create your glusterfs cluster anywhere accessible from your kubernetes cluster, than you create a service and an endpoint to your glusterfs cluster. Then you make a daemonset just to handle those connections and you can mount glusterfs volumes on your kubernetes cluster.
+
+If you want to use persistent volumes and persistent volume claims, they recommend using Heketi.
+
+I had so many problems with this deployment that I create volumes myself (we don't need many different volumes in our company, so it is fine), created one endpoint for glusterfs on each namespace and that's it. We mount glusterfs volumes on our pods as if they were regular servers
