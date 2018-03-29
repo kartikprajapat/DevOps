@@ -1,0 +1,56 @@
+{
+  "clusters": [
+    {
+      "nodes": [
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "ip-10-4-10-229"
+              ],
+              "storage": [
+                "10.4.10.229"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            "/dev/xvdf"
+          ]
+        },
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "ip-10-4-10-12"
+              ],
+              "storage": [
+                "10.4.10.12"
+              ]
+            },
+            "zone": 2
+          },
+          "devices": [
+            "/dev/xvdf"
+          ]
+        },
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "ip-10-4-10-211"
+              ],
+              "storage": [
+                "10.4.10.211"
+              ]
+            },
+            "zone": 3
+          },
+          "devices": [
+            "/dev/xvdf"
+          ]
+        }
+      ]
+    }
+  ]
+}
