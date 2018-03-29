@@ -1,0 +1,12 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: gluster-heketi-external
+provisioner: kubernetes.io/glusterfs
+parameters:
+  resturl: "http://ip-10-4-10-229:8080"
+  restuser: "admin"
+  secretName: "heketi-secret"
+  secretNamespace: "default"
+  #gidMin: "40000"
+  #gidMax: "50000"
