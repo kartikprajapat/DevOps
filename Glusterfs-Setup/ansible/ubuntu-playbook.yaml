@@ -1,0 +1,32 @@
+---
+  - name: Install Gluster
+    hosts: "{{ machine }}:{{ peer }}"
+    gather_facts: no
+    become: yes
+    tasks:
+      - name: installing software-properties-common
+        apt:
+          name: software-properties-common
+          state: latest
+      - name: adding repo
+        apt_repository:
+          repo: ppa:gluster/glusterfs-3.8
+          state: present
+      - name: installing glusterfs-server 
+        apt:
+          name: glusterfs-server
+          update_cache: yes
+          state: latest
+      - name: Start service glusterfs-server, if not running
+        service:
+          name: glusterfs-server
+          state: started
+
+  - hosts: "{{ machine }}"
+    gather_facts: no
+    become: yes
+    tasks:
+      - name: Configure peers (Only on the first host)
+        shell: gluster peer probe "{{ hostvars[item]['inventory_hostname'] }}"
+        with_items:
+          -  "{{ groups[peer] }}"
