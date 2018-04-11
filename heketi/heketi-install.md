@@ -126,3 +126,4 @@ heketi-cli volume create --size=1
 
 heketi-cli volume list
 
+<https://icicimov.github.io/blog/virtualization/Kubernetes-shared-storage-with-external-GlusterFS-backend/>
