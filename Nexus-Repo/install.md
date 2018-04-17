@@ -50,7 +50,7 @@ Select default under Blob store.
 
 Click the button Create repository.
 
-
+<https://www.ivankrizsan.se/2016/06/09/create-a-private-docker-registry/>
 
 # The private Docker registry is now ready to be used.
 
