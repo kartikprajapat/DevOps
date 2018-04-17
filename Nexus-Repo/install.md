@@ -55,4 +55,8 @@ Click the button Create repository.
 # The private Docker registry is now ready to be used.
 
 
+# For nexus cli
+
+https://hackernoon.com/cleanup-old-docker-images-from-nexus-repository-617b1004dad8
+
 
