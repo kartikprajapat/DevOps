@@ -15,6 +15,9 @@ mkdir -p /etc/heketi
 ssh-keygen -f /etc/heketi/heketi_key -t rsa -N ''
 chown heketi:heketi /etc/heketi/heketi_key*
 
+# Add thin pool binaries on each node
+apt-get install thin-provisioning-tools
+
 # On every machine do some configuration changes
 vi /etc/ssh/sshd_config
     PermitRootLogin yes
