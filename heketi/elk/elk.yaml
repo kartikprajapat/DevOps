@@ -1,0 +1,144 @@
+---
+kind: StatefulSet
+apiVersion: apps/v1beta1
+metadata:
+  name: elasticsearch
+  namespace: monitoring1
+  selfLink: "/apis/apps/v1beta1/namespaces/monitoring1/statefulsets/elasticsearch"
+  uid: 1ad319f8-4218-11e8-9a82-12a9adf106a0
+  resourceVersion: '3309835'
+  generation: 1
+  creationTimestamp: '2018-04-17T08:19:53Z'
+  labels:
+    component: elasticsearch
+    role: data
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: elasticsearch
+      role: data
+  template:
+    metadata:
+      creationTimestamp: 
+      labels:
+        component: elasticsearch
+        role: data
+    spec:
+      initContainers:
+      - name: init-sysctl
+        image: busybox
+        command:
+        - sysctl
+        - "-w"
+        - vm.max_map_count=262144
+        resources: {}
+        terminationMessagePath: "/dev/termination-log"
+        terminationMessagePolicy: File
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+      containers:
+      - name: elasticsearch
+        image: 52.45.150.72:5000/elasticsearch:6.1.3
+        ports:
+        - name: transport
+          containerPort: 9300
+          protocol: TCP
+        - name: http
+          containerPort: 9200
+          protocol: TCP
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: CLUSTER_NAME
+          value: elasticsearch-cluster
+        - name: NODE_MASTER
+          value: 'true'
+        - name: NODE_INGEST
+          value: 'true'
+        - name: NODE_DATA
+          value: 'true'
+        - name: HTTP_ENABLE
+          value: 'true'
+        - name: ES_JAVA_OPTS
+          value: "-Xms4g -Xmx4g"
+        - name: NUMBER_OF_MASTERS
+          value: '2'
+        - name: NETWORK_HOST
+          value: _eth0:ipv4_
+        resources:
+          limits:
+            memory: 8697308774400m
+        volumeMounts:
+        - name: es-data1
+          mountPath: "/data"
+        - name: elasticlogs1
+          mountPath: "/data/log"
+        livenessProbe:
+          tcpSocket:
+            port: transport
+          initialDelaySeconds: 20
+          timeoutSeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+        terminationMessagePath: "/dev/termination-log"
+        terminationMessagePolicy: File
+        imagePullPolicy: Always
+        securityContext:
+          capabilities:
+            add:
+            - IPC_LOCK
+          privileged: true
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      imagePullSecrets:
+      - name: dxp-repository
+      schedulerName: default-scheduler
+  volumeClaimTemplates:
+  - metadata:
+      name: es-data1
+      creationTimestamp: 
+    spec:
+      accessModes:
+      - ReadWriteMany
+      resources:
+        requests:
+          storage: 100Mi
+    status:
+      phase: Pending
+  - metadata:
+      name: elasticlogs1
+      creationTimestamp: 
+    spec:
+      accessModes:
+      - ReadWriteMany
+      resources:
+        requests:
+          storage: 200Mi
+    status:
+      phase: Pending
+  serviceName: elasticsearch-data
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: OnDelete
+  revisionHistoryLimit: 10
+status:
+  observedGeneration: 1
+  replicas: 3
+  readyReplicas: 3
+  currentReplicas: 3
+  currentRevision: elasticsearch-f96f9c9c7
+  updateRevision: elasticsearch-f96f9c9c7
+  collisionCount: 0
