@@ -42,7 +42,7 @@ Output would be like
     xvdf                                                                              202:80   0  20G  0 disk 
 
 
-# Copy that key to other machines
+# Run below on all machines (heketi one also)
 ssh-copy-id -i /etc/heketi/heketi_key.pub root@<machine-ip>
 
 # Verify the ssh is working with root or not
