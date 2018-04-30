@@ -1,2 +1,3 @@
 The KUBELET always try to run in the healthy state. In some cases when the nodes resources are low then kubelet may stop working and goes to the deadlock state.
 Kubelet proactivly checks the health of the nodes resources and if it finds that resources are being utilized very much then kubelet kills some of the pods, and changes the state of the pod to FAILED/EVICTED.
+<https://kubernetes.io/docs/tasks/administer-cluster/out-of-resource/>
