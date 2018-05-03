@@ -4,10 +4,14 @@
 
 3. When the pod is killed due to OOM then as per the restart policy the action is taken by kubelet.
 
-4. If the kubelet is unable to reclaim memory prior to a node experiencing system OOM, the oom_killer calculates an oom_score based on the percentage of memory itâ€™s using on the node, and then add the oom_score_adj to get an effective oom_score for the container, and then kills the container with the highest score.
+4. If the kubelet is unable to reclaim memory prior to a node experiencing system OOM, the oom_killer calculates an oom_score based on the percentage of memory it’s using on the node, and then add the oom_score_adj to get an effective oom_score for the container, and then kills the container with the highest score.
 The intended behavior should be that containers with the lowest quality of service that are consuming the largest amount of memory relative to the scheduling request should be killed first in order to reclaim memory.
 Unlike Pod eviction, if a Pod container is OOM killed, it may be restarted by the kubelet based on its RestartPolicy.
 
+5. Kubelet confuses sometimes in pod eviction when we create pod using daemonset. In this scenario kubelet tries to kill the pod(when it is consuming drastic amount of resources) but the pod gets redeployed on the same node which do not free up the resouces on that node due to which kubelet's motive does not completes.
+   So, it is recommended to launch less amount of pods as daemonset, and if it is necessary then the pod should be given the proper limits and request(guaranteed/same).
+   
+   
 
 
 
