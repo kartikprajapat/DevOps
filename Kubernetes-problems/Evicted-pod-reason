@@ -1,3 +1,18 @@
-The KUBELET always try to run in the healthy state. In some cases when the nodes resources are low then kubelet may stop working and goes to the deadlock state.
-Kubelet proactivly checks the health of the nodes resources and if it finds that resources are being utilized very much then kubelet kills some of the pods, and changes the state of the pod to FAILED/EVICTED.
+1. The KUBELET always try to run in the healthy state. In some cases when the nodes resources are low then kubelet may stop working and goes to the deadlock state.
+
+2. Kubelet proactivly checks the health of the nodes resources and if it finds that resources are being utilized very much then kubelet kills some of the pods, and changes the state of the pod to FAILED/EVICTED.
+
+3. When the pod is killed due to OOM then as per the restart policy the action is taken by kubelet.
+
+4. If the kubelet is unable to reclaim memory prior to a node experiencing system OOM, the oom_killer calculates an oom_score based on the percentage of memory it’s using on the node, and then add the oom_score_adj to get an effective oom_score for the container, and then kills the container with the highest score.
+The intended behavior should be that containers with the lowest quality of service that are consuming the largest amount of memory relative to the scheduling request should be killed first in order to reclaim memory.
+Unlike Pod eviction, if a Pod container is OOM killed, it may be restarted by the kubelet based on its RestartPolicy.
+
+
+
+
+Request -> This is the guaranteed amount of resource that node will give to pod.
+Limit -> This is the maximum amount of resource that node can give to pod.
+
+When request == limit, the resources are guaranteed, and when request < limit, the pod is guaranteed the request but can opportunistically scavenge the difference between request and limit if they are not being used by other containers. This allows Kubernetes to oversubscribe nodes, which increases utilization, while at the same time maintaining resource guarantees for the containers that need guarantees.
 <https://kubernetes.io/docs/tasks/administer-cluster/out-of-resource/>
