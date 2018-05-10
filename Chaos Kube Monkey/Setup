@@ -1,4 +1,12 @@
 Get the Binaries of Helm:
+
+    Desired output: Found node glustera.tftest.encompasshost.internal on cluster 37cc609c4ff862bfa69017747ea4aba4
+        Adding device /dev/xvdf ... OK
+    Found node glusterb.tftest.encompasshost.internal on cluster 37cc609c4ff862bfa69017747ea4aba4
+        Adding device /dev/xvdf ... OK
+    Found node glusterc.tftest.encompasshost.internal on cluster 37cc609c4ff862bfa69017747ea4aba4
+        Adding device /dev/xvdf ... OK
+        
 curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
 
 Give permissions to the sh file:
