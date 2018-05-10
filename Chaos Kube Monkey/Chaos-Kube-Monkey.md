@@ -1,4 +1,4 @@
-# Get the Binaties of Helm
+# Get the Binaries of Helm
 
 curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
 
@@ -32,6 +32,6 @@ helm install stable/chaoskube --set dryRun=false
 kubectl get pods --namespace kube-system
 
 
-# Importan Link
+# Important Link
 
 <<https://kubeapps.com/charts/stable/chaoskube>>
