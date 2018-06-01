@@ -1,4 +1,4 @@
-# Get the Binaries of Helm
+# Get the Binaries of Helm for Chaos monkey
 
 curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
 
