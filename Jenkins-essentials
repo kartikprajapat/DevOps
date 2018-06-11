@@ -1,0 +1,22 @@
+1. Run in container
+2. Dont do it on master use slaves
+3. If we are planning to use the jenkins slaves as containers then we need to install SWARM Plugin within the jenkins server.
+4. If we are planning to use ec2 or gce instances then we need EC2 fleet jenkins plugin, which would spin up the spot machine in the AWS and terminate it automatically after the given idle time interval.
+5. We have to run Jenkins master with the custom AMI which stores the data in the NFS. Then we should create a ASG which would run 1 Jenkins master everytime.
+6. We should create a custom AMI for jenkins slaves also which would have connection to NFS in AMI itself.
+7. Dont use Maven Job, rather use Pipelines(Feature of jenkins 2.0).
+8. Know the differences between Declarative/Scripted pipeline
+    Declarative: (i) Easy to use
+                 (ii) Validation before running
+                 (iii) Visual Editor
+                 (iv) For regular user
+    Scripted: (i) Bit harder due to more groovy
+              (ii) Boilerplate
+              (iii) Try-commit-Retry-commit-loop
+              (iv) Groovy editor
+              (v) For power users
+9. Use short jenkinsfiles
+10. Use Blue-Ocean GUI
+11. Create the shared liberary for the common code and use it multiple places.
+12. Use Build Monitor plugin to monitor jobs
+
