@@ -1,0 +1,93 @@
+Run the following Command on the Spinnaker Machine:
+ 
+1.  Install Halyard:
+ 
+    curl -O https://raw.githubusercontent.com/spinnaker/halyard/master/install/stable/InstallHalyard.sh
+    sudo bash InstallHalyard.sh
+ 
+2.  Check the the installed version of Halyard:
+ 
+    hal -v
+ 
+3.  Set Spinnaker version which would be installed:
+     
+    hal config version edit --version 1.5.0
+ 
+4.  Add Persistent storage S3 for Spinnaker PipeLines and Applications:
+    hal config storage s3 edit --access-key-id $YOUR_SECRET_KEY_ID --secret-access-key --region $REGION --bucket $bucketName --root-folder spinnaker
+    hal config storage edit --type s3
+ 
+5.  Add docker registry, if docker registry is running on HTTP then specify the address with http://$servername, in case of HTTPS then no need to specify:
+   
+    hal config provider docker-registry enable
+    hal config provider docker-registry account add $dockerregistryname --address $ADDRESS --repositories $REPOSITORIES --username $USERNAME  --password
+ 
+6.  Add Kubernetes account, before setting this up you need to get Kubernetes config file and copy on the host machine:
+   
+    hal config provider kubernetes enable
+    hal config provider kubernetes account add $environmentname --kubeconfig-file $filepath --docker-registries $dockerregistryname
+ 
+7.  Add Jenkins,  if Jenkins is running on HTTP then specify the address with http://, in case of HTTPS then no need to specify:
+    hal config ci jenkins enable
+    hal config ci jenkins master add $jenkinsname --address $BASEURL --username $USERNAME 
+ 
+8.  Run:
+    hal config security api edit --override-base-url http://$serverip:8084
+    hal config security ui edit --override-base-url http://$serverip:9000
+ 
+9.  Run:
+    cd .hal
+    hal deploy apply
+10. Run:
+    cd $root/.hal/default/service-settings
+ 
+11. Create new file in above location:
+    nano deck.yml
+    /* write below text in the file */ host: 0.0.0.0  
+    save (Ctrl+X) + y the file
+ 
+12. Create new file in above location:
+    nano gate.yml
+    /* write below text in the file */  host: 0.0.0.0  
+    save (Ctrl+X) + y the file
+  
+13. Run:
+    cd $root/.hal/default/profiles
+ 
+14. Create new file in above location:
+    nano gate-local.yml
+    /* write the below text in the file */
+ 
+       server:
+         address: 0.0.0.0
+ 
+       cors:
+         allowedOriginsPattern: http://$serverip:9000   
+ 
+    Save (Ctrl+X) + y the file
+ 
+15. Create new file in above location to enable email in Spinnaker:
+    nano echo-local.yml
+     /* write the below text in the file */
+ 
+       mail:
+         enabled: true
+         from: $EmailAccount
+       spring.mail:
+         host: $mail server host
+         port: $mail server port
+         username: $USERNAME
+         password: $PASSWORD
+         properties:
+            mail.smtp.auth: true
+            mail.smtp.starttls.enable: true
+ 
+     Save (Ctrl+X) + y the file
+ 
+16.  Run:
+     cd
+     cd $root/.hal
+     hal deploy apply
+ 
+After successful installation, you need to setup Pipeline for applications follow the link.
+https://decurtis.atlassian.net/wiki/spaces/MI6/pages/5276181/Guideline+to+use+CI+Jenkins+CD+Spinnaker
