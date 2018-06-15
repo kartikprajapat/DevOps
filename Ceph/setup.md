@@ -42,6 +42,7 @@ telnet mon1 22
 # Change the hostname of mon1 machine
 
 ssh mon1
+
 hostname mon1
 
 logout
