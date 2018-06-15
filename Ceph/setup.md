@@ -189,3 +189,8 @@ sudo ceph -s
 Reference
 
 <https://www.howtoforge.com/tutorial/how-to-build-a-ceph-cluster-on-centos-7/>
+
+
+Integration with Kubernetes
+
+<https://akomljen.com/using-existing-ceph-cluster-for-kubernetes-persistent-storage/>
