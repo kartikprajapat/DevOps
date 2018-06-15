@@ -186,3 +186,6 @@ sudo ceph -s
 
 
 
+Reference
+
+<https://www.howtoforge.com/tutorial/how-to-build-a-ceph-cluster-on-centos-7/>
