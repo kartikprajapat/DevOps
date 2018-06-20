@@ -1,18 +1,27 @@
 # Install heketi binaries
 wget https://github.com/heketi/heketi/releases/download/v4.0.0/heketi-v4.0.0.linux.amd64.tar.gz
+
 tar xzvf heketi-v4.0.0.linux.amd64.tar.gz
+
 cd heketi
+
 cp heketi heketi-cli /usr/local/bin/
+
 heketi -v
 
 groupadd -r -g 515 heketi
+
 useradd -r -c "Heketi user" -d /var/lib/heketi -s /bin/false -m -u 515 -g heketi heketi
+
 mkdir -p /var/lib/heketi && chown -R heketi:heketi /var/lib/heketi
+
 mkdir -p /var/log/heketi && chown -R heketi:heketi /var/log/heketi
+
 mkdir -p /etc/heketi
 
 # Generate a key for heketi
 ssh-keygen -f /etc/heketi/heketi_key -t rsa -N ''
+
 chown heketi:heketi /etc/heketi/heketi_key*
 
 # Add thin pool binaries on each node
@@ -103,7 +112,9 @@ vi /etc/heketi/topology.json
 # Set environment variables on heketi machine
 
 export HEKETI_CLI_SERVER=http://<HeketiMachineHostname>:8080
+    
 export HEKETI_CLI_USER=admin
+
 export HEKETI_CLI_KEY=PASSWORD
 
 # Load json to heketi
