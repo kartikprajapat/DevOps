@@ -1,16 +1,19 @@
 /*********************************************************************
-***** Description :: This template is used for NCL Open shift continuous deleivery. *****
+***** Description :: Test Jenkinsfile. *****
 ***** Revision *****:: 1.0*****
 **********************************************************************/
 
-
+//this function will be used to pull the code from the bitbucket where jenkinsfile is placed
 def funCodeCheckout(){
 checkout scm
 }
 
+//this will change the version number in the openshift param files and commit back to the bitbucket
 def funParamChange() {
-def oldver = sh returnStdout: true, script: "grep _VERSION $WORKSPACE/ship/decurtis/dxp-components/params/$ENV/$ServiceName | cut -f2 -d'='"
-def myFile = new File("$WORKSPACE/ship/decurtis/dxp-components/params/$ENV/$ServiceName")
+//this command will get the older version if it is stored in the params files in the form: "IMAGE_VERSION=<version>"
+def oldver = sh returnStdout: true, script: "grep _VERSION $WORKSPACE/path-to-param-files-folder/params/$ENV/$ServiceName | cut -f2 -d'='"
+//this will update the version number
+def myFile = new File("$WORKSPACE/path-to-params-folder/params/$ENV/$ServiceName")
 def fileText = myFile.text
 if (oldver.trim() == Version.trim()){
 echo "Version Not changed"
@@ -20,22 +23,25 @@ echo "Version changed"
 fileText = (fileText =~ /$oldver/).replaceFirst("$Version\n")
 myFile.write(fileText)
 sh '''
-cd $WORKSPACE/ship/decurtis/dxp-components/params/$ENV
+cd $WORKSPACE/path-to-params-folder/params/$ENV
 git add .
 git commit -m "JNK-123 Updating version number for param" $ServiceName
-git push https://ciduser:C0nT1nte@bitbucket.org/decurtis/dxp-openshift-templates.git HEAD:master'''
+git push https://ciduser:C0nT1nte@bitbucket.org/<bitbucket-url> HEAD:master'''
 } 
 }
 
+//deployment on OC cluster
 def funDeploy() {
 sh """
-cd $WORKSPACE/ship/decurtis/dxp-components
-oc login ${env.NCL_OC_DEV_QA1} -u ${env.UNAME} -p ${env.PASSWORD}  --insecure-skip-tls-verify=true
+cd $WORKSPACE/path-to-yml-files
+oc login ${env.OC_DEV_QA1} -u ${env.UNAME} -p ${env.PASSWORD}  --insecure-skip-tls-verify=true
 oc project $PROJECT
 oc process -f $YmlServiceName --param-file params/$ENV/$ServiceName | oc apply -n $PROJECT -f -
 """
 }
 
+
+//this will resolve the problem of multiple commits at the same time
 node () {
 stage ('Checkout Templates') {funCodeCheckout()}
 stage ('Version Change in Param') {
