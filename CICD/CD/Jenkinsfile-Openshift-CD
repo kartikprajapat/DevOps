@@ -1,0 +1,54 @@
+/*********************************************************************
+***** Description :: This template is used for NCL Open shift continuous deleivery. *****
+***** Revision *****:: 1.0*****
+**********************************************************************/
+
+
+def funCodeCheckout(){
+checkout scm
+}
+
+def funParamChange() {
+def oldver = sh returnStdout: true, script: "grep _VERSION $WORKSPACE/ship/decurtis/dxp-components/params/$ENV/$ServiceName | cut -f2 -d'='"
+def myFile = new File("$WORKSPACE/ship/decurtis/dxp-components/params/$ENV/$ServiceName")
+def fileText = myFile.text
+if (oldver.trim() == Version.trim()){
+echo "Version Not changed"
+}
+else{
+echo "Version changed"
+fileText = (fileText =~ /$oldver/).replaceFirst("$Version\n")
+myFile.write(fileText)
+sh '''
+cd $WORKSPACE/ship/decurtis/dxp-components/params/$ENV
+git add .
+git commit -m "JNK-123 Updating version number for param" $ServiceName
+git push https://ciduser:C0nT1nte@bitbucket.org/decurtis/dxp-openshift-templates.git HEAD:master'''
+} 
+}
+
+def funDeploy() {
+sh """
+cd $WORKSPACE/ship/decurtis/dxp-components
+oc login ${env.NCL_OC_DEV_QA1} -u ${env.UNAME} -p ${env.PASSWORD}  --insecure-skip-tls-verify=true
+oc project $PROJECT
+oc process -f $YmlServiceName --param-file params/$ENV/$ServiceName | oc apply -n $PROJECT -f -
+"""
+}
+
+node () {
+stage ('Checkout Templates') {funCodeCheckout()}
+stage ('Version Change in Param') {
+try {
+funParamChange()
+}
+catch(error) {
+echo "Git push failed, let's retry if accepted"
+retry(2) {
+funCodeCheckout()
+funParamChange()
+}
+}
+}
+stage ('Openshift Deployment') {funDeploy()}
+}
