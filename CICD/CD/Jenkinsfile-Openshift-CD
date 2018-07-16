@@ -58,3 +58,17 @@ funParamChange()
 }
 stage ('Openshift Deployment') {funDeploy()}
 }
+
+
+
+
+
+
+//Make the Jenkins pipeline as parametered and add below parameters in the pipeline
+//Version
+//ENV
+//PROJECT
+//ServiceName
+//YmlServiceName
+
+//pass the values accordignly at the time of mannual execution or we could take the trigger from any docker registry at the time of image push, here we used nexus and spinnaker for automated trigger when new image pushes to the nexus, spinnaker triggers the CD pipeline.
