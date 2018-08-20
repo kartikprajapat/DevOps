@@ -1,0 +1,153 @@
+import hudson.model.*
+import hudson.EnvVars
+import groovy.json.JsonSlurperClassic
+import groovy.json.JsonBuilder
+import groovy.json.JsonOutput
+import java.net.URL
+import groovy.transform.Field
+
+properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5'))])
+
+@Field def imageName = "nameoftheImage"
+@Field def jarName = "jarName"
+@Field def bitBucket = "GIT_URL"
+
+def funCodeCheckout() {
+summaryTemp = "Image Push failed: (${env.JOB_NAME}) (${env.BUILD_URL})"
+checkout scm
+}
+def funUnitTest() {
+echo "Dummy unit test"
+}
+
+def funPreBuild() {
+    def originalV = version();
+    def major = originalV[1];
+    def minor = originalV[2];
+    def patch = originalV[3];
+    def BUILD_NUMB  = Integer.parseInt(originalV[4]) + 1;
+    def v = "${major}.${minor}.${patch}.${BUILD_NUMB}"
+    sh "mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${v}"
+    sh '''git add . 
+    git config --global user.email "ciduser@xyz.com"
+    git config --list
+    #git commit -m "JNK-123 Updating version number for CI" pom.xml'''
+    sh "#git push https://ciduser:$CIDUSER_PASSWORD@${bitBucket} HEAD:master"
+}
+
+def version() {
+    def matcher = readFile('pom.xml') =~ '<version>(\\d*)\\.(\\d*)\\.(\\d*).(\\d*)</version>'
+    matcher ? matcher[0] : null
+}
+
+
+def funCodeCompile(){
+sh "mvn -f pom.xml -B clean deploy -Dapi.common.version=$COMMON_API_VERSION"
+}
+
+
+def funPostBuild() {
+sh "mkdir -p /tmp/dxp_jars/$JOB_NAME/$BUILD_NUMBER"
+sh "cp -r $WORKSPACE/target/${jarName} /tmp/dxp_jars/$JOB_NAME/$BUILD_NUMBER"
+sh "cp -r $WORKSPACE/pom.xml $WORKSPACE/docker/Dockerfile /tmp/dxp_jars/$JOB_NAME/$BUILD_NUMBER"
+}
+
+def funSonarAnalysis() {
+    withSonarQubeEnv('SonarServer') {
+        sh"""
+        mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar"""
+    }
+}
+
+def funDockerbuild() {
+pom = readMavenPom file: "/var/lib/jenkins/dxp_jars/$JOB_NAME/$BUILD_NUMBER/pom.xml"
+v = pom.version
+docker.withRegistry("http://REGISTRY_PATH", "REGISTRY-CREDENTIALS") {
+def customImage1 = docker.build("$REGISTRY_PATH/${imageName}:$v", "/var/lib/jenkins/dxp_jars/$JOB_NAME/$BUILD_NUMBER")
+customImage1.push()
+}
+docker.withRegistry("http://$REGISTRY_PATH_2", "VV-REGISTRY-CREDENTIALS") {
+def customImage2 = docker.build("$REGISTRY_PATH_2/${imageName}:$v", "/var/lib/jenkins/dxp_jars/$JOB_NAME/$BUILD_NUMBER")
+customImage2.push()
+}
+sh "rm -rf /var/lib/jenkins/jars/$JOB_NAME/$BUILD_NUMBER"
+}
+
+node('Docker_Slave') {
+def MAVEN_HOME=tool 'MAVEN'
+env.PATH="${MAVEN_HOME}/bin:$PATH"
+
+try{
+stage ("Checkout") {funCodeCheckout()}
+} catch (e) {
+def colorName = 'RED'
+def colorCode = '#FF0000'
+def subject = "Jenkins Checkout Error"
+def summary = "${subject} (${env.JOB_NAME}) (${env.BUILD_URL})"
+slackSend (channel: '#builds', color: colorCode, message: summary)
+throw e
+}
+
+stage ("Version Update") {funPreBuild()}
+
+try{
+stage ("Run Unit Tests"){funUnitTest()}
+} catch (e) {
+def colorName = 'YELLOW'
+def colorCode = '#FFFF00'
+def subject = "Jenkins Unit Test Cases Failiure"
+def summary = "${subject} (${env.JOB_NAME}) (${env.BUILD_URL})"
+slackSend (channel: '#builds', color: colorCode, message: summary)
+throw e
+}
+
+try {
+stage ("Build") {funCodeCompile()}
+} catch (e) {
+def colorName = 'RED'
+def colorCode = '#FF0000'
+def subject = "Jenkins Build Failure"
+def summary = "${subject} (${env.JOB_NAME}) (${env.BUILD_URL})"
+slackSend (channel: '#builds', color: colorCode, message: summary)
+throw e
+}
+
+try {
+stage ("Post-Build Steps") {funPostBuild()}
+} catch (e) {
+def colorName = 'YELLOW'
+def colorCode = '#FFFF00'
+def subject = "Jenkins Post Build Steps Failiure"
+def summary = "${subject} (${env.JOB_NAME}) (${env.BUILD_URL})"
+slackSend (channel: '#builds', color: colorCode, message: summary)
+throw e
+}
+
+try {
+stage ("Sonar Analysis") {funSonarAnalysis()}
+} catch (e) {
+def colorName = 'YELLOW'
+def colorCode = '#FFFF00'
+def subject = "Jenkins Sonar Analysis Failed"
+def summary = "${subject} (${env.JOB_NAME}) (${env.BUILD_URL})"
+slackSend (channel: '#builds', color: colorCode, message: summary)
+throw e
+}
+
+
+}
+node('Linux_Slave')
+{
+try {
+stage ("Build Docker Image and Push") {funDockerbuild()}
+} catch (e) {
+def colorName = 'RED'
+def colorCode = '#FF0000'
+def subject = "Slack-Jenkins Integration message"
+def summary = "Image push failed for service : ${imageName}"
+slackSend (channel: '#builds', color: colorCode, message: summaryTemp)
+throw e
+}
+//emailext body: 'Test mail for CI Pipeline', subject: 'Test mail for CI pipeline', to: 'ravindra.mittal@.com'
+// Default values
+}
