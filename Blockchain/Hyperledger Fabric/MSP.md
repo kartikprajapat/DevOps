@@ -31,4 +31,9 @@ In some scenarios we could also have a need to have muliple MSPs attached to a s
 
 
 # Organisatioal Units and MSPs
+An org is divided into multiple OUs, each of which has a certain set of responsibilities. 
 
+        For e.g. ORG1 has
+        1. ORG1-MANUFACTURING
+        2. ORG1-DISTRIBUTION
+Both of the above has specific tastks to perform.
