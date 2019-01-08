@@ -40,3 +40,36 @@ CRL is the Certificate Revocation List that is a collection of revocated certifi
 BC is the n/w that is way more than the just communication n/w. It reqires all of its identities to be verified as per PKI standards.
 
 
+# CA
+Trusted athority, they provide certificate to the actors of BC n/w. If someone trust CA than they could trust the actor also.
+Some of the tusted CAs are GeoTrust, Godaddy, Symantec, etc.
+In blockchain every actor that want to be the part of the BC n/w needs an Identity which is again issued by CAs. 
+
+# Root CA, Intermediate CA and Chain of trust
+Root CA are the ones that provide the origional certificate (GeoTrust, Symantec, etc), but intermediate certificates came into existance when the BC kind of n/w is introduced. To increase the security of root CA they are hidden form the end user, the end user just only knows about the intermediate CA. There could be multiple intermediate CAs in this chain. This makes the CHAIN OF TRUST. This means if intermediate CA becomes traitor then the COT is broken and it will be reported in BC n/w, which will eventually is more secure than only trusting on root CA.
+
+yellow certs -> green -> bule -> grey...... makes COT.
+
+
+# Fabric CA
+As we know that CA are very imp part, thats why Fabric n/w has its own CA. This CA provides certificates to the BC n/w. The certificates are then used by actors to get identity so that they can do transactions in the blockchain n/w. These certificates can not be used like the Root CA's certificate for browser and all. Rather they are limited for the BC n/w only.
+
+
+
+# Certificate revocation list
+The reference to the revoked certificates goes to this list. When one party wants to make trust with second party using second party's certificates then the first party goes to the CA and checks its CRL to check whether the certificates are expired or not. The second party have no mandation to check CRL but for security purpose it is recommended for them to do so.
+
+NOTE: The Revoked certificates are not the ones which are expired ones. They both are different.
+
+
+# Conclusion on CA and Identity
+1. We use CA for certification of the actors.
+2. BC has its own CA, whose certificates can be used within its network only.
+3. Root CA with intermediate CAs makes the Chain of trust.
+4. When certificates are assigned with the actors, they gets the identity.
+5. The revoked certificates goes to the CRL.
+6. Revoked and Expired certificates are diff.
+7. When the actors gets the identity it is decided by MSP that which actors will be the part of BC n/w.
+
+
+Further go to MSP for detail.
