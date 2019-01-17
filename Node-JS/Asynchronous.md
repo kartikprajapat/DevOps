@@ -32,7 +32,7 @@ Here is the approach of nodeJS (an asynchronous, "non blocking" approach)
 
 
 
-# Some points to remember in callbacks:
+# Some points to remember about callbacks:
            
     1. Error parameter should be the first parameterto the callback function
             
