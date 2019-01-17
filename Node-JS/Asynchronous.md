@@ -1,6 +1,7 @@
 When we write code in this Non-Blocking asynchronous env, then we need to follow the different approach.
 
 Here is the typical approach to write code:
+
   var conn = getDbConnection(connectionString);
   var stmt = conn.createStatement();
   var result = stmt.executeQuery(sqlQuery);
