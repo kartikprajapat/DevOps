@@ -2,12 +2,12 @@ When we write code in this Non-Blocking asynchronous env, then we need to follow
 
 Here is the typical approach to write code:
 
-  var conn = getDbConnection(connectionString);
-  var stmt = conn.createStatement();
-  var result = stmt.executeQuery(sqlQuery);
-  for(var i=0; i<result.length; i++) {
+    var conn = getDbConnection(connectionString);
+    var stmt = conn.createStatement();
+    var result = stmt.executeQuery(sqlQuery);
+    for(var i=0; i<result.length; i++) {
     //print results[i]
-  }
+    }
   
   
 Here the main point to note is that each function returns a value before the next function is called. Here each statement is build on the result of the prior one.
