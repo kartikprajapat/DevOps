@@ -36,3 +36,31 @@ docker rm -f $(docker ps -a | grep fabric | awk '{print $1}')
 docker rm -f $(docker ps -a | grep dev-peer | awk '{print $1}')
 
 docker network rm net_byfn
+
+
+
+
+
+# Setup Composer
+
+mkdir -p /home/ubuntu/fabric1.3/composer
+mkdir -p /home/ubuntu/fabric1.3/composer/org1
+mkdir -p /home/ubuntu/fabric1.3/composer/org2
+
+
+cd /home/ubuntu/fabric1.3/composer/
+
+Create byfn-network.json
+
+vi byfn-network.json
+(paste the content from file present in repo)
+
+
+
+cd /home/ubuntu/fabric1.3/fabric-samples/first-network
+
+awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt > /home/ubuntu/fabric1.3/composer/org1/ca-org1.txt
+
+awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt > /home/ubuntu/fabric1.3/composer/org2/ca-org2.txt
+
+awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt > /home/ubuntu/fabric1.3/composer/ca-orderer.txt
