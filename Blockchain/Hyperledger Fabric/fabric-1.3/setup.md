@@ -20,6 +20,8 @@ Note: If the error is like:
    
    Then run below command and tearup again
    docker-compose -f docker-compose-cli.yaml down --volumes --remove-orphan
+   
+   If CA throws error then please replace the name of file in the volume mount with the correct one, the correct name can be found at the mount folder.
 
 
 
