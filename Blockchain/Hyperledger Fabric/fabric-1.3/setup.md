@@ -80,15 +80,15 @@ Note:   If CA throws error then please replace the name of file in the volume mo
 
             cd /home/ubuntu/fabric1.3/fabric-samples/first-network
 
-5. hhh
+5. Generates CA TLS certificates for org1
 
             awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt > /home/ubuntu/fabric1.3/composer/org1/ca-org1.txt
 
-6. hhh
+6. Generates CA TLS certificates for org2
 
             awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt > /home/ubuntu/fabric1.3/composer/org2/ca-org2.txt
 
-7. hhh
+7. Generates CA TLS certificates for org3
 
             awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt > /home/ubuntu/fabric1.3/composer/ca-orderer.txt
 
@@ -153,35 +153,43 @@ Note: copy content from file present in repo
             composer network start -c PeerAdmin@byfn-network-org1 -n aob-erp-blockchain -V 0.0.1 -o endorsementPolicyFile=/home/ubuntu/fabric1.3/composer/endorsement-policy.json -A aob-erp-blockchain -C aob-erp-blockchain/admin-pub.pem -A aob-erp-blockchain2 -C aob-erp-blockchain2/admin-pub.pem
 
 
-15. 
-composer card create -p /home/ubuntu/fabric1.3/composer/org1/byfn-network-org1.json -u aob-erp-blockchain -n aob-erp-blockchain -c aob-erp-blockchain/admin-pub.pem -k aob-erp-blockchain/admin-priv.pem
+15. Create Business card to perform operations on Network:
 
-composer card import -f aob-erp-blockchain@aob-erp-blockchain.card
+            composer card create -p /home/ubuntu/fabric1.3/composer/org1/byfn-network-org1.json -u aob-erp-blockchain -n aob-erp-blockchain -c aob-erp-blockchain/admin-pub.pem -k aob-erp-blockchain/admin-priv.pem
 
-composer network ping -c aob-erp-blockchain@aob-erp-blockchain
+            composer card import -f aob-erp-blockchain@aob-erp-blockchain.card
+
+            composer network ping -c aob-erp-blockchain@aob-erp-blockchain
 
 
 
-composer card create -p /home/ubuntu/fabric1.3/composer/org2/byfn-network-org2.json -u aob-erp-blockchain2 -n aob-erp-blockchain -c aob-erp-blockchain2/admin-pub.pem -k aob-erp-blockchain2/admin-priv.pem
+            composer card create -p /home/ubuntu/fabric1.3/composer/org2/byfn-network-org2.json -u aob-erp-blockchain2 -n aob-erp-blockchain -c aob-erp-blockchain2/admin-pub.pem -k aob-erp-blockchain2/admin-priv.pem
 
-composer card import -f aob-erp-blockchain2@aob-erp-blockchain.card
+            composer card import -f aob-erp-blockchain2@aob-erp-blockchain.card
 
-composer network ping -c aob-erp-blockchain2@aob-erp-blockchain
+            composer network ping -c aob-erp-blockchain2@aob-erp-blockchain
 
 
 
 Note: Pass network name in start-docker.sh file in composer rest server
 
-sed -e 's/peer0.org1.example.com:7051/13.127.202.129:7051/' -e 's/ca.org1.example.com:7054/13.127.202.129:7054/'  -e 's/orderer.example.com:7050/13.127.202.129:7050/' -e 's/peer1.org1.example.com:7051/13.127.202.129:8051/' -e 's/peer0.org2.example.com:7051/13.127.202.129:9051/' -e 's/peer1.org2.example.com:7051/13.127.202.129:10051/' -e 's/ca.org2.example.com:7054/13.127.202.129:8054/'  < $HOME/.composer/cards/aob-erp-blockchain@aob-erp-blockchain/connection.json  > ./tmp/connection.json && cp -p ./tmp/connection.json $HOME/.composer/cards/aob-erp-blockchain@aob-erp-blockchain/
+
+16. Make changes for docker networking:
+
+            sed -e 's/peer0.org1.example.com:7051/13.127.202.129:7051/' -e 's/ca.org1.example.com:7054/13.127.202.129:7054/'  -e 's/orderer.example.com:7050/13.127.202.129:7050/' -e 's/peer1.org1.example.com:7051/13.127.202.129:8051/' -e 's/peer0.org2.example.com:7051/13.127.202.129:9051/' -e 's/peer1.org2.example.com:7051/13.127.202.129:10051/' -e 's/ca.org2.example.com:7054/13.127.202.129:8054/'  < $HOME/.composer/cards/aob-erp-blockchain@aob-erp-blockchain/connection.json  > ./tmp/connection.json && cp -p ./tmp/connection.json $HOME/.composer/cards/aob-erp-blockchain@aob-erp-blockchain/
+
+17. Add Participant:
+
+            composer participant add -c aob-erp-blockchain@aob-erp-blockchain -d '{"$class":"org.hyperledger.composer.system.NetworkAdmin", "participantId":"restadmin2"}'
+            
+            composer identity issue -c aob-erp-blockchain@aob-erp-blockchain -f restadmin2.card -u restadmin2 -a "resource:org.hyperledger.composer.system.NetworkAdmin#restadmin2"
+
+            composer card import -f restadmin2.card
+            composer network ping -c restadmin2@aob-erp-blockchain
+
+18. make further changes:
+
+            sed -e 's/13.127.202.129:7051/peer0.org1.example.com:7051/' -e 's/13.127.202.129:7054/ca.org1.example.com:7054/'  -e 's/13.127.202.129:7050/orderer.example.com:7050/' -e 's/13.127.202.129:8051/peer1.org1.example.com:7051/' -e 's/13.127.202.129:9051/peer0.org2.example.com:7051/' -e 's/13.127.202.129:10051/peer1.org2.example.com:7051/' -e 's/13.127.202.129:8054/ca.org2.example.com:7054/'  < $HOME/.composer/cards/aob-erp-blockchain@aob-erp-blockchain/connection.json  > ./tmp/connection.json && cp -p ./tmp/connection.json $HOME/.composer/cards/aob-erp-blockchain@aob-erp-blockchain/
 
 
-composer participant add -c aob-erp-blockchain@aob-erp-blockchain -d '{"$class":"org.hyperledger.composer.system.NetworkAdmin", "participantId":"restadmin2"}'
-composer identity issue -c aob-erp-blockchain@aob-erp-blockchain -f restadmin2.card -u restadmin2 -a "resource:org.hyperledger.composer.system.NetworkAdmin#restadmin2"
-composer card import -f restadmin2.card
-composer network ping -c restadmin2@aob-erp-blockchain
-
-
-sed -e 's/13.127.202.129:7051/peer0.org1.example.com:7051/' -e 's/13.127.202.129:7054/ca.org1.example.com:7054/'  -e 's/13.127.202.129:7050/orderer.example.com:7050/' -e 's/13.127.202.129:8051/peer1.org1.example.com:7051/' -e 's/13.127.202.129:9051/peer0.org2.example.com:7051/' -e 's/13.127.202.129:10051/peer1.org2.example.com:7051/' -e 's/13.127.202.129:8054/ca.org2.example.com:7054/'  < $HOME/.composer/cards/aob-erp-blockchain@aob-erp-blockchain/connection.json  > ./tmp/connection.json && cp -p ./tmp/connection.json $HOME/.composer/cards/aob-erp-blockchain@aob-erp-blockchain/
-
-
-Run admin.sh and rest-admin.sh
+Note: Run admin.sh and rest-admin.sh
