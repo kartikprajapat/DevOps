@@ -34,94 +34,126 @@ Note:   If CA throws error then please replace the name of file in the volume mo
 
 
 # Tear Down Steps
+1. Change the current dir:
 
-cd fabric-samples/first-network
+            cd fabric-samples/first-network
 
-docker-compose -f docker-compose-cli.yaml down --volumes --remove-orphan
+2. Clear orphan containers and vols:
 
-docker rm -f $(docker ps -a | grep fabric | awk '{print $1}')
+            docker-compose -f docker-compose-cli.yaml down --volumes --remove-orphan
 
-docker rm -f $(docker ps -a | grep dev-peer | awk '{print $1}')
+3. Remove fabric containers:
 
-docker network rm net_byfn
+            docker rm -f $(docker ps -a | grep fabric | awk '{print $1}')
+
+4. Remove Peer Chaincode containers:
+
+            docker rm -f $(docker ps -a | grep dev-peer | awk '{print $1}')
+
+5. Tear Down the whole network:
+
+            docker network rm net_byfn
 
 
 
 
 
 # Setup Composer
+1. Make below directory structure:
 
-mkdir -p /home/ubuntu/fabric1.3/composer
-mkdir -p /home/ubuntu/fabric1.3/composer/org1
-mkdir -p /home/ubuntu/fabric1.3/composer/org2
+            mkdir -p /home/ubuntu/fabric1.3/composer
+            mkdir -p /home/ubuntu/fabric1.3/composer/org1
+            mkdir -p /home/ubuntu/fabric1.3/composer/org2
 
 
-cd /home/ubuntu/fabric1.3/composer/
+2. Change current Directory:
 
-Create byfn-network.json
+            cd /home/ubuntu/fabric1.3/composer/
 
-vi byfn-network.json
+3. Create BYFN JSON:
+
+            vi byfn-network.json
 (paste the content from file present in repo)
 
 
+4. Change the directory to setup first N/W:
 
-cd /home/ubuntu/fabric1.3/fabric-samples/first-network
+            cd /home/ubuntu/fabric1.3/fabric-samples/first-network
 
-#command1
-awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt > /home/ubuntu/fabric1.3/composer/org1/ca-org1.txt
+5. hhh
 
-#command2
-awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt > /home/ubuntu/fabric1.3/composer/org2/ca-org2.txt
+            awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt > /home/ubuntu/fabric1.3/composer/org1/ca-org1.txt
 
-#command3
-awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt > /home/ubuntu/fabric1.3/composer/ca-orderer.txt
+6. hhh
+
+            awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt > /home/ubuntu/fabric1.3/composer/org2/ca-org2.txt
+
+7. hhh
+
+            awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt > /home/ubuntu/fabric1.3/composer/ca-orderer.txt
 
 
-EDIT byfn-network.json and replace INSERT_ORG1_CA_CERT with o/p of command1 And INSERT_ORG2_CA_CERT with o/p of command2 And INSERT_ORDERER_CA_CERT with o/p of command3.
-
+Note: EDIT byfn-network.json and replace INSERT_ORG1_CA_CERT with o/p of command1 And INSERT_ORG2_CA_CERT with o/p of command2 And INSERT_ORDERER_CA_CERT with o/p of command3.
 
 Copy byfn-network.json in /home/ubuntu/fabric1.3/org1 and /home/ubuntu/fabric1.3/org2 folder with byfn-network-org1.json and byfn-network-org2.json respectively.
 
 Edit byfn-network-org2.json and replace Org1 with Org2
 
-cd /home/ubuntu/fabric1.3/fabric-samples/first-network
-export ORG1=crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-cp -p $ORG1/signcerts/A*.pem /tmp/composer/org1
-cp -p $ORG1/keystore/*_sk /tmp/composer/org1
+8. Change current dir:
 
-export ORG2=crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
-cp -p $ORG2/signcerts/A*.pem /tmp/composer/org2
-cp -p $ORG2/keystore/*_sk /tmp/composer/org2
+            cd /home/ubuntu/fabric1.3/fabric-samples/first-network
+            
+            export ORG1=crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+            cp -p $ORG1/signcerts/A*.pem /tmp/composer/org1
+            cp -p $ORG1/keystore/*_sk /tmp/composer/org1
 
-
-composer card create -p /home/ubuntu/fabric1.3/composer/org1/byfn-network-org1.json -u PeerAdmin -c /home/ubuntu/fabric1.3/composer/org1/Admin@org1.example.com-cert.pem -k /home/ubuntu/fabric1.3/composer/org1/*_sk -r PeerAdmin -r ChannelAdmin -f PeerAdmin@byfn-network-org1.card
-
-
-composer card create -p /home/ubuntu/fabric1.3/composer/org2/byfn-network-org2.json -u PeerAdmin -c /home/ubuntu/fabric1.3/composer/org2/Admin@org2.example.com-cert.pem -k /home/ubuntu/fabric1.3/composer/org2/*_sk -r PeerAdmin -r ChannelAdmin -f PeerAdmin@byfn-network-org2.card
+            export ORG2=crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
+            cp -p $ORG2/signcerts/A*.pem /tmp/composer/org2
+            cp -p $ORG2/keystore/*_sk /tmp/composer/org2
 
 
+9. Create Cards: 
 
-composer card import -f PeerAdmin@byfn-network-org1.card --card PeerAdmin@byfn-network-org1
+            composer card create -p /home/ubuntu/fabric1.3/composer/org1/byfn-network-org1.json -u PeerAdmin -c /home/ubuntu/fabric1.3/composer/org1/Admin@org1.example.com-cert.pem -k /home/ubuntu/fabric1.3/composer/org1/*_sk -r PeerAdmin -r ChannelAdmin -f PeerAdmin@byfn-network-org1.card
 
 
-composer card import -f PeerAdmin@byfn-network-org2.card --card PeerAdmin@byfn-network-org2
+            composer card create -p /home/ubuntu/fabric1.3/composer/org2/byfn-network-org2.json -u PeerAdmin -c /home/ubuntu/fabric1.3/composer/org2/Admin@org2.example.com-cert.pem -k /home/ubuntu/fabric1.3/composer/org2/*_sk -r PeerAdmin -r ChannelAdmin -f PeerAdmin@byfn-network-org2.card
+
+
+
+10. Import the created cards:
+
+            composer card import -f PeerAdmin@byfn-network-org1.card --card PeerAdmin@byfn-network-org1
+
+
+            composer card import -f PeerAdmin@byfn-network-org2.card --card PeerAdmin@byfn-network-org2
 
 
 
 Note: Copy BNA file to the current folder
 
-composer network install --card PeerAdmin@byfn-network-org1 --archiveFile aob-erp-blockchain.bna
-composer network install --card PeerAdmin@byfn-network-org2 --archiveFile aob-erp-blockchain.bna
+11. Install BNA
 
-composer identity request -c PeerAdmin@byfn-network-org1 -u admin -s adminpw -d aob-erp-blockchain
-composer identity request -c PeerAdmin@byfn-network-org1 -u admin -s adminpw -d aob-erp-blockchain2
+            composer network install --card PeerAdmin@byfn-network-org1 --archiveFile aob-erp-blockchain.bna
+            composer network install --card PeerAdmin@byfn-network-org2 --archiveFile aob-erp-blockchain.bna
 
-touch endorsement-policy.json
-copy content from file present in repo
+12. Request the identity:
 
-composer network start -c PeerAdmin@byfn-network-org1 -n aob-erp-blockchain -V 0.0.1 -o endorsementPolicyFile=/home/ubuntu/fabric1.3/composer/endorsement-policy.json -A aob-erp-blockchain -C aob-erp-blockchain/admin-pub.pem -A aob-erp-blockchain2 -C aob-erp-blockchain2/admin-pub.pem
+            composer identity request -c PeerAdmin@byfn-network-org1 -u admin -s adminpw -d aob-erp-blockchain
+            composer identity request -c PeerAdmin@byfn-network-org1 -u admin -s adminpw -d aob-erp-blockchain2
+
+13. Create endorsment policy:
+
+            touch endorsement-policy.json
+
+Note: copy content from file present in repo
+
+14. Start the composer Network:
+
+            composer network start -c PeerAdmin@byfn-network-org1 -n aob-erp-blockchain -V 0.0.1 -o endorsementPolicyFile=/home/ubuntu/fabric1.3/composer/endorsement-policy.json -A aob-erp-blockchain -C aob-erp-blockchain/admin-pub.pem -A aob-erp-blockchain2 -C aob-erp-blockchain2/admin-pub.pem
 
 
+15. 
 composer card create -p /home/ubuntu/fabric1.3/composer/org1/byfn-network-org1.json -u aob-erp-blockchain -n aob-erp-blockchain -c aob-erp-blockchain/admin-pub.pem -k aob-erp-blockchain/admin-priv.pem
 
 composer card import -f aob-erp-blockchain@aob-erp-blockchain.card
