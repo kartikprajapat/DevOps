@@ -1,0 +1,27 @@
+spec:
+  additionalUserData:
+  - content: |
+      #!/bin/sh
+      mkdir -p /etc/docker/
+      cd /etc/docker
+      echo "{
+      \"insecure-registries\" : [\"<registry-ip>:5000\", \"<nexus-registry-ip>:8123\", \"<registry-ip>:5000\"] }" >> daemon.json
+      cp /daemon.json /etc/docker/
+      service docker restart
+      mkdir -p /root/.docker/
+      touch /root/.docker/config.json
+      echo '{ "auths": { "<registry-ip>:5000": { "auth": "YWRtaW46U29uYXR5cGUxIQ==" }, "<registry-ip>:5000": { "auth": "YWRtaW46YWRtaW4xMjM=" } } }' >> /root/.docker/config.json
+      service docker restart
+    name: beforestart.sh
+    type: text/x-shellscript
+  image: 379101102735/debian-stretch-hvm-x86_64-gp2-2018-06-13-59294
+  machineType: c5.xlarge
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: nodes
+  role: Node
+  rootVolumeSize: 20
+  subnets:
+  - us-west-1a
+  - us-west-1b

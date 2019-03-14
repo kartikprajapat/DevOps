@@ -1,0 +1,2 @@
+registry = 'http://api-erp-dev-k8s-local-0acbh0-1824233108.us-west-1.elb.amazonaws.com:31873'
+#registry = 'http://erp-dev-k8s-master.aob-erp-private.local:31873'

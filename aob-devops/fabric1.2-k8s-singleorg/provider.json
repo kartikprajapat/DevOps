@@ -1,0 +1,10 @@
+{
+    "jwt": {
+    "provider": "jwt",
+    "module": "/home/composer/node_modules/custom-jwt.js",
+    "secretOrKey": "-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAwf5XVsvd+umVFh3dP73z+K/Aw87k5oTE7emziF9iYeOTBPptarnC\n8ZFDgXLOMS1uLHLBGvh+mJC9Fz8R9nFeJCok6hhLE5rOZrJAYqq1AZOC62+fMBRK\n0lqm6LMu2zI4r6d7TlIPbEBNLc8rYH1ZqLO53EYHKywZdXmwaufMujfsf6WmWW3f\nzTSrJoUj0K86XutxMFr+dWOjotl+LX2ZDpgYx3Kl6d7mZARGeCFk4Tlj0hwfswYC\nIgbAvTrop+prYofizhE/qBtlYJWnOo1a5CDxHadcxWFtQaVJUUBGfdKambc8w5ke\n41w8EajdtFCN01zy49azTqO9nSBhzUajBwIDAQAB\n-----END RSA PUBLIC KEY-----\n",
+    "authScheme": "saml",
+    "successRedirect": "/",
+    "failureRedirect":"/"
+    }
+}

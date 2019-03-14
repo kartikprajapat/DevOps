@@ -1,0 +1,210 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: d-2ze9419cu2b826fgoomb
+spec:
+  capacity:
+    storage: 1G
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /
+    server: fs-f86463b3.efs.us-east-1.amazonaws.com
+  storageClassName: aws-efs
+  flexVolume:
+    driver: "alicloud/disk"
+    fsType: "ext4"
+    options:
+      volumeId: "d-2ze9419cu2b826fgoomb"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ namespace: peerorg1-demo
+ name: d-2ze9419cu2b826fgoomb
+ annotations:
+  volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+ accessModes:
+   - ReadWriteMany
+ resources:
+   requests:
+     storage: 1G
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: peerorg1-demo
+  name:	peer1-peerorg1-demo
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+       app: hyperledger
+       role: peer
+       peer-id: peer1
+       org: peerorg1-demo
+    spec:
+      affinity:
+       podAntiAffinity:
+         preferredDuringSchedulingIgnoredDuringExecution:
+         - weight: 100
+           podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: "role"
+                  operator: In
+                  values:
+                  - peer
+                - key: "org"
+                  operator: In
+                  values:
+                  - peerorg1-demo
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+#      - name: couchdb
+#        image: hyperledger/fabric-couchdb:x86_64-0.10
+#        ports:
+#         - containerPort: 5984
+
+
+      - name: peer1-peerorg1-demo 
+        image: hyperledger/fabric-peer:x86_64-1.1.0-preview
+        env:
+        - name: CORE_LEDGER_STATE_STATEDATABASE
+          value: "CouchDB"
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS
+          value: "173.0.1.81:5984"
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME
+          value: "admin"
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
+          value: "aobcdb321*77"
+        - name: CORE_VM_ENDPOINT
+          value: "unix:///host/var/run/docker.sock"
+        - name: CORE_LOGGING_LEVEL
+          value: "DEBUG"
+        - name: CORE_PEER_TLS_ENABLED
+          value: "true"
+        - name: CORE_PEER_GOSSIP_USELEADERELECTION
+          value: "true"
+        - name: CORE_PEER_GOSSIP_ORGLEADER
+          value: "false" 
+        - name: CORE_PEER_PROFILE_ENABLED
+          value: "true"
+        - name: CORE_PEER_TLS_CERT_FILE
+          value: "/etc/hyperledger/fabric/tls/server.crt"
+        - name: CORE_PEER_TLS_KEY_FILE
+          value: "/etc/hyperledger/fabric/tls/server.key"
+        - name: CORE_PEER_TLS_ROOTCERT_FILE
+          value: "/etc/hyperledger/fabric/tls/ca.crt"
+        - name: CORE_PEER_TLS_SERVERHOSTOVERRIDE
+          value: peer1.peerorg1-demo
+        - name: CORE_PEER_ID
+          value: peer1.peerorg1-demo
+        - name: CORE_PEER_ADDRESS
+          value: peer1.peerorg1-demo:7051
+        - name: CORE_PEER_GOSSIP_EXTERNALENDPOINT
+          value: peer1.peerorg1-demo:7051
+        - name: CORE_PEER_LOCALMSPID
+          value: Peerorg1MSP
+        - name: CORE_PEER_MSPCONFIGPATH
+          value: /etc/hyperledger/fabric/msp
+        - name: CORE_PEER_ADDRESSAUTODETECT
+          value: "true"
+        - name: aliyun_logs_fluentd
+          value: "stdout"
+
+        workingDir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+        ports:
+         - containerPort: 7051
+         - containerPort: 7052
+         - containerPort: 7053
+        command: ["peer"]
+        args: ["node","start"]
+        volumeMounts:
+         #- mountPath: /opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+         #  name: certificate
+         #  subPath: channel-artifacts
+         - mountPath: /etc/hyperledger/fabric/msp
+           name: certificate
+           #subPath: crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp
+           subPath: peers/peer1.peerorg1-demo/msp
+         - mountPath: /etc/hyperledger/fabric/tls
+           name: certificate
+           #subPath: crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/
+           subPath: peers/peer1.peerorg1-demo/tls
+         - mountPath: /host/var/run/
+           name: run
+         - mountPath: /var/hyperledger/production
+           name: data
+           subPath: peer1.peerorg1-demo
+      volumes:
+       - name: certificate
+         persistentVolumeClaim:
+             claimName: peerorg1-demo-pv
+       - name: data
+         persistentVolumeClaim:
+             claimName: d-2ze9419cu2b826fgoomb
+       - name: run
+         hostPath:
+           path: /run
+---
+apiVersion: v1
+kind: Service
+metadata:
+   namespace: peerorg1-demo
+   name: peer1
+spec:
+ selector:
+   app: hyperledger
+   role: peer
+   peer-id: peer1
+   org: peerorg1-demo
+ clusterIP: None
+ ports:
+   - name: listen-endpoint
+     protocol: TCP
+     port: 7051
+
+   - name: chaincode-listen
+     protocol: TCP
+     port: 7052
+
+   - name: event-listen
+     protocol: TCP
+     port: 7053
+---
+apiVersion: v1
+kind: Service
+metadata:
+   namespace: peerorg1-demo
+   name: peer1-ex
+spec:
+ selector:
+   app: hyperledger
+   role: peer
+   peer-id: peer1
+   org: peerorg1-demo
+ type: NodePort
+ ports:
+   - name: listen-endpoint
+     protocol: TCP
+     port: 7051
+     targetPort: 7051
+     nodePort: 30503
+
+   - name: chaincode-listen
+     protocol: TCP
+     port: 7052
+     targetPort: 7052
+     nodePort: 30504
+
+   - name: event-listen
+     protocol: TCP
+     port: 7053
+     targetPort: 7053
+     nodePort: 30505
+---

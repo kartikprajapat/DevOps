@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: environment-configmap
+data:
+  GLOBAL_APP_SETTING_PATH: /etc/properties/app/application.yaml
+  NOTIFICATION_SERVICE_APP_SETTING_PATH: /etc/properties/service/notification-service.yaml
+  PAYMENT_SERVICE_APP_SETTING_PATH: /etc/properties/service/payment-service.yaml
+  MEDIA_SERVICE_APP_SETTING_PATH: /etc/properties/service/media-service.yaml
+  NOTIFICATION_LOG_FILE_SETTING_PATH: /var/log/applogs/notification-service.logs
+  PAYMENT_LOG_FILE_SETTING_PATH: /var/log/applogs/payment.logs
+  MEDIA_LOG_FILE_SETTING_PATH: /var/log/applogs/media.logs

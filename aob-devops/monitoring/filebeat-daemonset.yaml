@@ -1,0 +1,52 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: filebeat
+  labels:
+    k8s-app: filebeat
+spec:
+  template:
+    metadata:
+      labels:
+        k8s-app: filebeat
+    spec:
+      containers:
+      - name: filebeat
+        image: 13.127.243.52:5000/filebeat:6.5.4
+        args: [
+          "-c", "/etc/filebeat/filebeat.yml",
+          "-e",
+        ]
+        volumeMounts:
+        - name: config
+          mountPath: /etc/filebeat
+        - name: log
+          mountPath: /var/log/filebeat
+        - name: application-logs
+          mountPath: /var/logs/application
+        - name: fabric-logs
+          mountPath: /var/log/containers
+        - name: fabric-pod-log
+          mountPath: /var/log/pods
+        - name: fabric-physical-logs
+          mountPath: /var/lib/docker/containers
+      volumes:
+      - name: config
+        configMap:
+          name: filebeat-configmap
+      - name: log
+        hostPath:
+          path: /var/log/filebeat 
+      - name: application-logs
+        hostPath:
+          path: /var/logs/application
+      - name: fabric-logs
+        hostPath:
+          path: /var/log/containers
+      - name: fabric-pod-log
+        hostPath:
+          path: /var/log/pods
+      - name: fabric-physical-logs
+        hostPath:
+          path: /var/lib/docker/containers
+

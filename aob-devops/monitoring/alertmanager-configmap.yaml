@@ -1,0 +1,44 @@
+apiVersion: v1
+data:
+  config.yml: |2-
+    global:
+    templates:
+    - '/etc/alertmanager-templates/*.tmpl'
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 30s
+      group_interval: 30s
+      repeat_interval: 1h
+      receiver: NFR-Team
+      routes:
+      - match:
+          Team: NFR-Team
+        receiver: NFR-Team
+        repeat_interval: 30m
+      - match:
+          Team: Stemcell-Dev-Team
+        receiver: Stemcell-Dev-Team
+        repeat_interval: 10m
+      
+    receivers:
+    - name: 'NFR-Team'
+      email_configs:
+      - to:  sudhir.kumawat@allonblock.com,kamal.gupta@allonblock.com,nitin.prakash@allonblock.com
+        from: sudhir.kumawat@allonblock.com
+        smarthost: smtp.gmail.com:587
+        auth_username: "sudhir.kumawat@allonblock.com"
+        auth_identity: "sudhir.kumawat@allonblock.com"
+        auth_password: "India*9246"
+    - name: 'Stemcell-Dev-Team'
+      email_configs:
+      - to:  sudhir.kumawat@allonblock.com,kamal.gupta@allonblock.com,nitin.prakash@allonblock.com
+        from: sudhir.kumawat@allonblock.com
+        smarthost: smtp.gmail.com:587
+        auth_username: "sudhir.kumawat@allonblock.com"
+        auth_identity: "sudhir.kumawat@allonblock.com"
+        auth_password: "India*9246"
+        
+kind: ConfigMap
+metadata:
+  name: alertmanager
+  namespace: monitoring

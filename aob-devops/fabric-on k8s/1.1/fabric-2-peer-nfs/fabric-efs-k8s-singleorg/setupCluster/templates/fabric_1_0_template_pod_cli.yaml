@@ -1,0 +1,144 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: $artifactsName
+    labels:
+      name: $artifactsName
+spec:
+    capacity:
+       storage: 500Mi
+    accessModes:
+       - ReadWriteMany
+    nfs: 
+      path: /opt/share/channel-artifacts
+      server: 13.234.19.253 #change to your nfs server ip here
+      #server: fs-ed2327a6.efs.us-east-1.amazonaws.com #change to your nfs server ip here
+    storageClassName: gp2
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    namespace: $namespace
+    name: $artifactsName
+spec:
+   accessModes:
+     - ReadWriteMany
+   resources:
+      requests:
+        storage: 10Mi
+   selector:
+    matchLabels:
+      name: $artifactsName
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: production-data
+  labels:
+    name: production-data
+
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /var/hyperledger/production
+    server: 13.234.19.253
+  storageClassName: gp2
+
+---
+
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    namespace: $namespace
+    name: production-data
+spec:
+   accessModes:
+     - ReadWriteMany
+   resources:
+      requests:
+        storage: 200Mi
+   selector:
+    matchLabels:
+      name: production-data
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+   namespace: $namespace
+   name: $name
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+       app: cli
+    spec:
+      containers:
+        - name: $name
+          image:  13.127.243.52:5000/hyperledger/fabric-tools:x86_64-1.1.0
+          env:
+          
+          - name: CORE_PEER_TLS_ENABLED
+            value: "false"
+          #- name: CORE_PEER_TLS_CERT_FILE
+          #  value: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1/peers/peer0.org1/tls/server.crt
+          #- name: CORE_PEER_TLS_KEY_FILE
+          #  value: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1/peers/peer0.org1/tls/server.key
+          #- name: CORE_PEER_TLS_ROOTCERT_FILE
+          #  value: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1/peers/peer0.org1/tls/ca.crt
+          - name: CORE_VM_ENDPOINT
+            value: unix:///host/var/run/docker.sock
+          - name: GOPATH
+            value: /opt/gopath
+          - name: CORE_LOGGING_LEVEL
+            value: DEBUG
+          - name: CORE_PEER_ID
+            value: $name
+          - name: CORE_PEER_ADDRESS
+            value: $peerAddress
+          - name: CORE_PEER_LOCALMSPID
+            value: $mspid
+          - name: CORE_PEER_MSPCONFIGPATH
+            value: /etc/hyperledger/fabric/msp
+          workingDir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+          command: [ "/bin/bash", "-c", "--" ]
+          args: [ "while true; do sleep 30; done;" ]
+          volumeMounts:
+          # - mountPath: /opt/gopath/src/github.com/hyperledger/fabric/peer
+          #   name: certificate
+          #   subPath: scripts
+           - mountPath: /host/var/run/
+             name: run
+          # - mountPath: /opt/gopath/src/github.com/hyperledger/fabric/examples/chaincode/go
+          #   name: certificate
+          #   subPath: chaincode
+           - mountPath: /etc/hyperledger/fabric/msp
+             name: certificate
+             subPath: $mspPath
+           - mountPath: /opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+             name: artifacts
+#           - mountPath: /etc/hyperledger/fabric/core.yaml
+#             name: core
+      volumes:
+        - name: certificate
+          persistentVolumeClaim:
+              claimName: $pvName
+        - name: artifacts
+          persistentVolumeClaim:
+              claimName: $artifactsName
+        - name: run
+          hostPath:
+            path: /var/run 
+#        - name: core
+#          hostPath:
+#            path: /opt/share/core-config/core.yaml

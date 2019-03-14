@@ -1,0 +1,20 @@
+cd /tmp
+curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > install-helm.sh
+chmod u+x install-helm.sh
+./install-helm.sh
+kubectl -n kube-system create serviceaccount tiller
+kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+helm init --service-account tiller
+
+
+git clone https://github.com/hashicorp/consul-helm.git
+cd consul-helm
+git checkout v0.1.0
+helm install --name consul ./
+
+
+If some pods are pending then we can edit statefulset file and hard code the number of replicas.
+Number of replicas are equal to number of nodes present in k8s cluster.
+
+# To delete consul
+helm delete consul --purge

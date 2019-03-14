@@ -1,0 +1,65 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: plant-composer
+  labels:
+    app: plant-composer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plant-composer
+  template:
+    metadata:
+      labels:
+        app: plant-composer
+    spec:
+      containers:
+      - name: composer-rest-server
+        image: 34.228.226.73:5000/aob-rest-composer
+        ports:
+        - containerPort: 3000
+        env:
+        - name: COMPOSER_CARD
+          value: "nitin@plants-lifecycle"
+        - name: COMPOSER_NAMESPACES
+          value: "never"
+        - name: COMPOSER_AUTHENTICATION
+          value: "true"
+        - name: COMPOSER_MULTIUSER
+          value: "true"
+        - name: COMPOSER_PROVIDERS
+          value: ""
+        - name: COMPOSER_DATASOURCES
+          value: "{
+    			\"db\": {
+        			\"name\": \"db\",
+        			\"connector\": \"mongodb\",
+        			\"host\": \"34.228.226.73\"
+    			}
+		}"
+        volumeMounts:
+        - mountPath: /home/composer/.composer/
+          name: composer-data
+      volumes:
+      - name: composer-data
+        hostPath:
+          path: /home/composer/.composer
+
+        
+      
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: plant-composer
+spec:
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+    nodePort: 31005
+  selector:
+     app: plant-composer

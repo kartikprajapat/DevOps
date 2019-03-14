@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-svc
+  labels:
+    app: svc
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api
+        backend:
+          serviceName: stemcell-service
+          servicePort: 80
+      - path: /resolve
+        backend:
+          serviceName: stemcell-resolver
+          servicePort: 80
+      - path: /composer-rest
+        backend:
+          serviceName: stemcell-admin-composer
+          servicePort: 80
+      - path: /ordersmgmt/api
+        backend:
+          serviceName: ordermanagement-service
+          servicePort: 80

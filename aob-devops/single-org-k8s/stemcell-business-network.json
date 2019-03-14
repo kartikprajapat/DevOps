@@ -1,0 +1,68 @@
+{
+    "name": "stemcell-business-network",
+    "x-type": "hlfv1",
+    "version": "1.0.0",
+    "peers": {
+        "peer0.org1": {
+            "url": "grpc://production-master.aob-stemcell-private.local:30001"
+        },
+        "peer1.org1": {
+            "url": "grpc://production-master.aob-stemcell-private.local:30003"
+        }
+    },
+    "certificateAuthorities": {
+        "ca.org1": {
+            "url": "http://production-master.aob-stemcell-private.local:30000",
+            "caName": "ca"
+        }
+    },
+    "orderers": {
+        "orderer0.orgorderer1": {
+            "url": "grpc://production-master.aob-stemcell-private.local:32000"
+        }
+    },
+    "organizations": {
+        "Org1": {
+            "mspid": "Org1MSP",
+            "peers": [
+                "peer0.org1",
+                "peer1.org1"
+            ],
+            "certificateAuthorities": [
+                "ca.org1"
+            ]
+        }
+    },
+    "channels": {
+        "mychannel": {
+            "orderers": [
+                "orderer0.orgorderer1"
+            ],
+            "peers": {
+                "peer0.org1": {
+                    "endorsingPeer": true,
+                    "chaincodeQuery": true,
+                    "eventSource": true
+                },
+                "peer1.org1": {
+                    "endorsingPeer": true,
+                    "chaincodeQuery": true,
+                    "eventSource": true
+                }
+            }
+        }
+    },
+    "client": {
+        "organization": "Org1",
+        "connection": {
+            "timeout": {
+                "peer": {
+                    "endorser": "1200",
+                    "eventHub": "1200",
+                    "eventReg": "1200"
+                },
+                "orderer": "1200"
+            }
+        }
+    }
+}

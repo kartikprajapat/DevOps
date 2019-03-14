@@ -1,0 +1,187 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: d-2ze8pw637jbjqtnxfosb
+spec:
+  storageClassName: aws-efs
+  capacity:
+    storage: 1G
+  nfs:
+    path: /
+    server: fs-f86463b3.efs.us-east-1.amazonaws.com
+  accessModes:
+    - ReadWriteMany
+  flexVolume:
+    driver: "alicloud/disk"
+    fsType: "ext4"
+    options:
+      volumeId: "d-2ze8pw637jbjqtnxfosb"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: d-2ze4nj01p2wx5ulx1i9p
+spec:
+  storageClassName: aws-efs
+  capacity:
+    storage: 1G
+  nfs:
+    path: /
+    server: fs-f86463b3.efs.us-east-1.amazonaws.com
+  accessModes:
+    - ReadWriteMany
+  flexVolume:
+    driver: "alicloud/disk"
+    fsType: "ext4"
+    options:
+      volumeId: "d-2ze4nj01p2wx5ulx1i9p"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ namespace: kafka
+ name: d-2ze8pw637jbjqtnxfosb
+ annotations:
+  volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+ accessModes:
+   - ReadWriteMany
+ resources:
+   requests:
+     storage: 1G
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ namespace: kafka
+ name: d-2ze4nj01p2wx5ulx1i9p
+ annotations:
+  volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+ accessModes:
+   - ReadWriteMany
+ resources:
+   requests:
+     storage: 1G
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: kafka
+  name: zookeeper2-kafka
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+       app: hyperledger
+       role: zookeeper
+       zookeeper-id: zookeeper2
+       ns: kafka
+    spec:
+      affinity:
+       podAntiAffinity:
+         requiredDuringSchedulingIgnoredDuringExecution:
+         - labelSelector:
+             matchExpressions:
+             - key: "role"
+               operator: In
+               values:
+               - zookeeper
+           topologyKey: "kubernetes.io/hostname"
+      terminationGracePeriodSeconds: 120
+      containers:
+        - name: zookeeper2-kafka
+          image: hyperledger/fabric-zookeeper:x86_64-1.0.6
+          env:
+            - name: ZOO_MY_ID
+              value: "3"
+            - name: ZOO_SERVERS
+              value: "server.1=zookeeper0.kafka:2888:3888 server.2=zookeeper1.kafka:2888:3888 server.3=0.0.0.0:2888:3888"
+            - name: ZOO_TICK_TIME
+              value: "2000"
+            - name: ZOO_INIT_LIMIT
+              value: "10"
+            - name: ZOO_SYNC_LIMIT
+              value: "2"
+            - name: aliyun_logs_fluentd
+              value: "stdout"
+          volumeMounts:
+            - mountPath: /datalog
+              name: datalog
+              subPath: zookeeper2-kafka-log
+            - mountPath: /data
+              name: data
+              subPath: zookeeper2-kafka
+          lifecycle:
+            preStop:
+              exec:
+                # SIGTERM triggers a quick exit; gracefully terminate instead
+                command: ["zkServer.sh", "stop"]
+      volumes:
+        - name: datalog
+          persistentVolumeClaim:
+              claimName: d-2ze8pw637jbjqtnxfosb
+        - name: data
+          persistentVolumeClaim:
+              claimName: d-2ze4nj01p2wx5ulx1i9p
+---
+apiVersion: v1
+kind: Service
+metadata:
+   namespace: kafka
+   name: zookeeper2
+spec:
+ selector:
+   app: hyperledger
+   role: zookeeper
+   zookeeper-id: zookeeper2
+   ns: kafka
+ clusterIP: None
+
+ ports:
+   - name: zookeeper-port1
+     protocol: TCP
+     port: 2888
+
+   - name: zookeeper-port2
+     protocol: TCP
+     port: 3888
+
+   - name: zookeeper-port3
+     protocol: TCP
+     port: 2181
+---
+apiVersion: v1
+kind: Service
+metadata:
+   namespace: kafka
+   name: zookeeper2-ex
+spec:
+ selector:
+   app: hyperledger
+   role: zookeeper
+   zookeeper-id: zookeeper2
+   ns: kafka
+ type: NodePort
+ ports:
+   - name: zookeeper-port1
+     protocol: TCP
+     port: 2888
+     targetPort: 2888
+     nodePort: 32757
+
+   - name: zookeeper-port2
+     protocol: TCP
+     port: 3888
+     targetPort: 3888
+     nodePort: 32758
+
+   - name: zookeeper-port3
+     protocol: TCP
+     port: 2181
+     targetPort: 2181
+     nodePort: 32759
+---

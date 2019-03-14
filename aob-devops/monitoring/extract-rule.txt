@@ -1,0 +1,6 @@
+instance count
+kube-dns  npm registry
+
+component down
+
+npm registry

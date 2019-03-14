@@ -1,0 +1,117 @@
+apiVersion: v1
+data:
+  service-running-status.rules: |
+    ALERT ComponentDownAlert
+      IF ((kube_pod_container_status_running{pod=~".*stemcell.*"} or kube_pod_container_status_running{pod=~".*notification-service.*"} or kube_pod_container_status_running{pod=~".*zipcode-service.*"} or kube_pod_container_status_running{pod=~".*order.*"} or kube_pod_container_status_running{pod=~".*npmregistry.*"} or kube_pod_container_status_running{pod=~".*blockchain-ws-listener-service.*"})) ==  0
+      FOR 3m
+      LABELS {
+        Team="Stemcell-Dev-Team",
+        Env="Stemcell-Production"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Service {{ $labels.container}} is down. Pod name of service on kubernetes cluster is  {{ $labels.pod}} "
+      }
+
+  container-instance.rules: |
+    ALERT ComponentInstanceCountExceededAlert
+      IF (kube_replicaset_status_replicas{replicaset=~".*stemcell.*"} or kube_replicaset_status_replicas{replicaset=~".*notification-service.*"} or kube_replicaset_status_replicas{replicaset=~".*zipcode-service.*"} or kube_replicaset_status_replicas{replicaset=~".*order.*"} or kube_replicaset_status_replicas{replicaset=~".*npmregistry.*"} or kube_replicaset_status_replicas{replicaset=~".*blockchain-ws-listener-service.*"}) !=  1
+      FOR 3m
+      LABELS {
+        Team="Stemcell-Dev-Team",
+        Env="Stemcell-Production"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Number of Current instances is not equal to the permissiable value for replica set {{ $labels.replicaset }} .Current number of instances are {{ $value }}  "
+      }
+
+  container-memory-usage.rules: |
+   ALERT ComponentMemoryLimitExceededAlert
+      IF((container_memory_working_set_bytes{pod_name=~".*stemcell.*"} or container_memory_working_set_bytes{pod_name=~".*notification-service.*"} or container_memory_working_set_bytes{pod_name=~".*zipcode-service.*"} or container_memory_working_set_bytes{pod_name=~".*order.*"} or container_memory_working_set_bytes{pod_name=~".*npmregistry.*"} or container_memory_working_set_bytes{pod_name=~".*blockchain-ws-listener-service.*"})/(1024*1024) > 300)
+      FOR 3m
+      LABELS {
+        Team="Stemcell-Dev-Team",
+        Env="Stemcell-Production"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Memory usage  of {{ $labels.container_name}} has exceeded above the permisiable value. The current memory usage of the service is {{ $value}} MB. The service is currently deployed on {{ $labels.instance}}"
+      }
+
+################ Node level Alerts #################################
+
+  cpu-usage.rules: |
+   ALERT NodeCPUUsageExceededAlert
+      IF (100 - (avg by (instance) (irate(node_cpu{component="node-exporter",mode="idle"}[5m])) * 100)) > 85
+      FOR 2m
+      LABELS {
+        Team="NFR-Team",
+        Env="Stemcell-Production"
+      }
+      ANNOTATIONS {
+        SUMMARY = "CPU usage of Node : {{ $labels.instance }} has exceeded permissible limit of 85% . The current value is {{ $value }} core"
+      }
+
+  instance-availability.rules: |
+   ALERT InstanceDownAlert
+      IF up{job="node"} == 0
+      FOR 1m
+      LABELS { 
+        Team="NFR-Team",
+        Env="Stemcell-Production"
+      }
+      ANNOTATIONS {
+        summary = "Instance {{ $labels.instance }} down",
+        description = "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute.",
+      }
+      
+   ALERT NodeNotReadyStatusAlert
+      IF (kube_node_status_ready{condition != "true"}) == 1
+      FOR 2m
+      LABELS {
+        Team="NFR-Team",
+        Env="Stemcell-Production"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Node : {{ $labels.node }} is not in ready state either it is Unknown or False state"
+      }
+
+  low-disk-space.rules: |
+   ALERT NodeDiskSpaceExceededAlert
+      IF ((node_filesystem_size{mountpoint="/"} - node_filesystem_free{mountpoint="/"} ) / node_filesystem_size{mountpoint="/"} * 100) > 70
+      FOR 2m
+      LABELS {
+        Team="NFR-Team",
+        Env="Stemcell-Production"
+      }
+      ANNOTATIONS {
+         SUMMARY = "DiskSpace usage of Node : {{ $labels.instance }} has exceeded permissible limit of 70% . The current value is {{ $value }} MB"
+      }
+
+  mem-usage.rules: |
+   ALERT NodeSwapUsageExceededAlert
+      IF (((node_memory_SwapTotal-node_memory_SwapFree)/node_memory_SwapTotal)*100) > 85
+      FOR 2m
+      LABELS {
+        Team="NFR-Team",
+        Env="Stemcell-Production"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Swape Memory usage of Node : {{ $labels.instance }} has exceeded above the permissible limit of 85% . The current value is {{ $value }} MB"
+      }
+
+   ALERT NodeMemoryUsageExceededAlert
+      IF (((node_memory_MemTotal-node_memory_MemFree-node_memory_Cached-node_memory_Buffers)/node_memory_MemTotal)*100) > 85
+      FOR 2m
+      LABELS {
+        Team="NFR-Team",
+        Env="Stemcell-Production"
+      }
+      ANNOTATIONS {
+        SUMMARY = "Memory usage of Node : {{ $labels.instance }} has exceeded  permissible limit of 85% . The current value is {{ $value }} MB"
+      }
+
+
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: prometheus-rules
+  namespace: monitoring

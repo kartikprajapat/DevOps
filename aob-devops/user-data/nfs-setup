@@ -1,0 +1,35 @@
+# Run below command on NFS server machine
+
+sudo apt-get update
+
+sudo apt-get -y install nfs-kernel-server
+
+sudo mkdir -p /opt/share
+
+sudo chown nobody:nogroup /opt/share
+
+sudo chmod -R 777 /opt/share
+
+vi /etc/exports
+    /opt/share	<client-ip>(rw,sync,no_subtree_check,no_root_squash)
+    /var/hyperledger/production     <k8s node1 ip>(rw,sync,no_subtree_check,no_root_squash)
+    /var/hyperledger/production     <k8s node2 ip>(rw,sync,no_subtree_check,no_root_squash)
+    
+mkdir -p /var/hyperledger/production
+
+chmod -R 777 /var/hyperledger/production
+    
+
+sudo exportfs -r
+
+sudo service nfs-kernel-server restart
+
+
+
+# Run below command on NFS client machine
+
+sudo apt-get update
+sudo apt-get -y install nfs-common
+showmount -e <server-ip>
+sudo mount -t nfs <server-ip>:/opt/share /opt/share
+

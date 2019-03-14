@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: npmregistry-deployment
+  labels:
+    app: npmregistry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: npmregistry
+  template:
+    metadata:
+      labels:
+        app: npmregistry
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: npmregistry
+        image: 13.127.243.52:5000/verdaccio
+        ports:
+        - containerPort: 4873
+        volumeMounts:
+        - mountPath: /verdaccio/storage/
+          name: npmregistry-storage
+      volumes:
+      - name: npmregistry-storage
+        hostPath:
+          path: /home/repo
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: npmregistry-service
+spec:
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 4873
+    nodePort: 31873
+  selector:
+     app: npmregistry

@@ -1,0 +1,163 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: peerorg1-demo-artifacts-pv
+spec:
+    capacity:
+       storage: 500Mi
+    accessModes:
+       - ReadWriteMany
+    nfs: 
+      path: /channel-artifacts
+      server: fs-f86463b3.efs.us-east-1.amazonaws.com
+    storageClassName: aws-efs
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    namespace: peerorg1-demo
+    name: peerorg1-demo-artifacts-pv
+    annotations:
+        volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+   accessModes:
+     - ReadWriteMany
+   resources:
+      requests:
+        storage: 10Mi
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: ordererorg-demo-peerorg1-demo-pv
+spec:
+    capacity:
+       storage: 500Mi
+    accessModes:
+       - ReadWriteMany
+    nfs:
+      path: /crypto-config/ordererOrganizations/ordererorg-demo/msp/tlscacerts
+      server: fs-f86463b3.efs.us-east-1.amazonaws.com #change to your nfs server ip here
+    storageClassName: aws-efs
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    namespace: peerorg1-demo
+    name: ordererorg-demo-peerorg1-demo-pv
+    annotations:
+        volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+   accessModes:
+     - ReadWriteMany
+   resources:
+      requests:
+        storage: 10Mi
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+   namespace: peerorg1-demo
+   name: cli
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+       app: cli
+    spec:
+      affinity:
+       podAntiAffinity:
+         requiredDuringSchedulingIgnoredDuringExecution:
+         - labelSelector:
+             matchExpressions:
+             - key: "app"
+               operator: In
+               values:
+               - cli
+           topologyKey: "kubernetes.io/hostname"
+       podAffinity:
+         preferredDuringSchedulingIgnoredDuringExecution:
+         - weight: 100
+           podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: "role"
+                  operator: In
+                  values:
+                  - peer
+                - key: "org"
+                  operator: In
+                  values:
+                  - peerorg1-demo
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: cli
+          image:  hyperledger/fabric-tools:x86_64-1.1.0-preview
+          env:
+          
+          - name: CORE_PEER_TLS_ENABLED
+            value: "true"
+          - name: CORE_PEER_TLS_CERT_FILE
+            value: "/etc/hyperledger/fabric/tls/server.crt"
+          - name: CORE_PEER_TLS_KEY_FILE
+            value: "/etc/hyperledger/fabric/tls/server.key"
+          - name: CORE_PEER_TLS_ROOTCERT_FILE
+            value: "/etc/hyperledger/fabric/tls/ca.crt"
+          - name: CORE_VM_ENDPOINT
+            value: unix:///host/var/run/docker.sock
+          - name: GOPATH
+            value: /opt/gopath
+          - name: CORE_LOGGING_LEVEL
+            value: DEBUG
+          - name: CORE_PEER_ID
+            value: cli
+          - name: CORE_PEER_ADDRESS
+            value: peer0.peerorg1-demo:7051
+          - name: CORE_PEER_LOCALMSPID
+            value: Peerorg1MSP
+          - name: CORE_PEER_MSPCONFIGPATH
+            value: /etc/hyperledger/fabric/msp
+          - name: aliyun_logs_fluentd
+            value: "stdout"
+          workingDir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+          command: [ "/bin/bash", "-c", "--" ]
+          args: [ "while true; do sleep 30; done;" ]
+          volumeMounts:
+          # - mountPath: /opt/gopath/src/github.com/hyperledger/fabric/peer
+          #   name: certificate
+          #   subPath: scripts
+           - mountPath: /host/var/run/
+             name: run
+          # - mountPath: /opt/gopath/src/github.com/hyperledger/fabric/examples/chaincode/go
+          #   name: certificate
+          #   subPath: chaincode
+           - mountPath: /etc/hyperledger/fabric/msp
+             name: certificate
+             subPath: users/Admin@peerorg1-demo/msp
+           - mountPath: /etc/hyperledger/fabric/tls
+             name: certificate
+             subPath: users/Admin@peerorg1-demo/tls
+           - mountPath: /etc/hyperledger/fabric/orderertls
+             name: orderercertificate
+           - mountPath: /opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+             name: artifacts
+      volumes:
+        - name: orderercertificate
+          persistentVolumeClaim:
+              claimName: ordererorg-demo-peerorg1-demo-pv
+        - name: certificate
+          persistentVolumeClaim:
+              claimName: peerorg1-demo-pv
+        - name: artifacts
+          persistentVolumeClaim:
+              claimName: peerorg1-demo-artifacts-pv
+        - name: run
+          hostPath:
+            path: /var/run 

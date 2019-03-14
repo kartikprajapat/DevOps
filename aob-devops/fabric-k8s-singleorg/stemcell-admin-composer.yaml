@@ -1,0 +1,62 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: stemcell-admin-composer
+  labels:
+    app: stemcell-admin-composer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stemcell-admin-composer
+  template:
+    metadata:
+      labels:
+        app: stemcell-admin-composer
+    spec:
+      containers:
+      - name: stemcell-admin-composer
+        image: 13.127.243.52:5000/aob-rest-composer:0.20.0
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "500m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
+        env:
+        - name: COMPOSER_CARD
+          value: "nitin@stem-cells"
+        - name: COMPOSER_NAMESPACES
+          value: "never"
+        - name: COMPOSER_APIKEY
+          value: "stemcell"
+        - name: COMPOSER_DATASOURCES
+          value: '{"db": { "database": "stemcell","connector": "mongodb","host": "production-mongo.aob-stemcell-private.local","port": "26935"} }'
+        volumeMounts:
+        - mountPath: /home/composer/.composer/
+          name: composer-data
+      volumes:
+      - name: composer-data
+        hostPath:
+          path: /home/composer/.composer
+
+        
+      
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: stemcell-admin-composer
+spec:
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+    nodePort: 31007
+  selector:
+     app: stemcell-admin-composer

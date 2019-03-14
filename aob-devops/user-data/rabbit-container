@@ -1,0 +1,14 @@
+mkdir -p /var/log/rabbitmq
+mkdir -p /etc/rabbitmq/
+mkdir -p /var/lib/rabbitmq
+chmod -R 731 /var/lib/rabbitmq/
+chmod -R 777 /var/log/rabbitmq
+
+docker run -d --name rabbitmq-management --restart always -p 15672:15672 -p 5672:5672 -v /var/lib/rabbitmq:/var/lib/rabbitmq -v /etc/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf -v /var/log/rabbitmq:/var/log/rabbitmq rabbitmq:3-management
+
+// Add user in rabbitmq
+
+rabbitmqctl add_user radmin radmin
+rabbitmqctl set_user_tags radmin administrator
+rabbitmqctl set_permissions -p / radmin ".*" ".*" ".*"
+rabbitmqctl list_users

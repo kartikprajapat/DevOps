@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: orgorderer1
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: orgorderer1-pv
+  labels:
+    name: orgorderer1-pv
+spec:
+  capacity:
+    storage: 500Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /crypto-config/ordererOrganizations/orgorderer1
+    #server: 173.0.1.138
+    server: fs-ed2327a6.efs.us-east-1.amazonaws.com
+  #change to your nfs server ip here
+  storageClassName: aws-efs
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: orgorderer1
+  name: orgorderer1-pv
+  annotations:
+    volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Mi
+  selector:
+     matchLabels:
+       name: orgorderer1-pv
+---

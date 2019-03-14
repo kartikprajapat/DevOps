@@ -1,0 +1,45 @@
+#!/bin/bash
+sudo apt-get update
+sudo apt-get upgrade -y
+sudo mkdir -p /var/lib/mongodb/
+sudo chmod -R 777 /var/lib/mongodb/
+sudo apt-get -y install nfs-common
+sudo mount -t nfs4 <efs-address>:/ /var/lib/mongodb/
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+sudo echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb.list
+sudo apt-get update
+sudo apt install -y mongodb-org=4.0.1 mongodb-org-server=4.0.1 mongodb-org-shell=4.0.1 mongodb-org-mongos=4.0.1 mongodb-org-tools=4.0.1
+sudo systemctl start mongod
+sudo systemctl enable mongod
+sudo sed -i 's/bindIp: 127.0.0.1/bindIp: 0.0.0.0/g' /etc/mongod.conf
+sudo sed -i 's/port: 27017/port: 26935/g' /etc/mongod.conf
+sudo chmod -R 777 /var/lib/mongodb
+sudo systemctl restart mongod
+sudo apt-get update
+sudo apt install npm -y
+sudo apt-get update
+sudo apt install nodejs-legacy -y
+sudo chmod -R 777 /var/lib/mongodb
+sudo npm install mongo-express
+sudo cd /node_modules/mongo-express/
+ls -lart
+sudo sed -i 's/localhost/0.0.0.0/g' /node_modules/mongo-express/config.default.js
+sudo sed -i 's/8081/28019/g' /node_modules/mongo-express/config.default.js
+sudo sed -i "s/password: process.env.ME_CONFIG_BASICAUTH_PASSWORD || 'pass'/password: process.env.ME_CONFIG_BASICAUTH_PASSWORD || '<mongo-ui-password>'/g" /node_modules/mongo-express/config.default.js
+sudo sed -i "s/admin: process.env.ME_CONFIG_MONGODB_ENABLE_ADMIN ? process.env.ME_CONFIG_MONGODB_ENABLE_ADMIN.toLowerCase() === 'true' : false/admin: true/g" /node_modules/mongo-express/config.default.js
+sudo sed -i 's/port:   process.env.ME_CONFIG_MONGODB_PORT || mongo.port/port: 26935/g' /node_modules/mongo-express/config.default.js
+sudo chmod -R 777 /var/lib/mongodb/
+sudo systemctl restart mongod
+ls -lart
+sleep 20s
+sudo nohup node /node_modules/mongo-express/app.js &
+echo "command done"
+
+
+########## Run mongo express in container and run on startup
+
+docker run -d --restart always --name mongo-express -p 28020:8081 -e ME_CONFIG_MONGODB_SERVER="<mongo-host-ip>" -e ME_CONFIG_MONGODB_PORT="27017" -e ME_CONFIG_BASICAUTH_USERNAME="admin" -e ME_CONFIG_BASICAUTH_PASSWORD="<mongo-ui-password>" mongo-express
+
+### restart policy in running container #####
+
+docker update --restart always <container-id>

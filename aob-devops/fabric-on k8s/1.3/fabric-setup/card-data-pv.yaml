@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: card-data
+  labels:
+    name: card-data
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /
+    server: fs-22ff333b.efs.us-west-1.amazonaws.com #change to your nfs server ip here
+  storageClassName: aws-efs
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: card-data
+    annotations:
+        volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+   accessModes:
+     - ReadWriteMany
+   resources:
+      requests:
+        storage: 200Mi
+   selector:
+    matchLabels:
+      name: card-data
+

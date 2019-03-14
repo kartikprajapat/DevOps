@@ -1,0 +1,61 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ordermanagement-admin-composer
+  labels:
+    app: ordermanagement-admin-composer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ordermanagement-admin-composer
+  template:
+    metadata:
+      labels:
+        app: ordermanagement-admin-composer
+    spec:
+      containers:
+      - name: ordermanagement-admin-composer
+        image: 13.127.243.52:5000/aob-rest-composer:0.19.14
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "500m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        env:
+        - name: COMPOSER_CARD
+          value: "ashish@order-management"
+        - name: COMPOSER_NAMESPACES
+          value: "never"
+        - name: COMPOSER_DATASOURCES
+          value: '{"db": { "database": "ordermanagement","connector": "mongodb","host": "173.0.1.231","port": "26935"} }'
+        volumeMounts:
+        - mountPath: /home/composer/.composer/
+          name: composer-data
+      volumes:
+      - name: composer-data
+        hostPath:
+          path: /home/composer/.composer
+
+        
+      
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: ordermanagement-admin-composer
+spec:
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+    nodePort: 31009
+  selector:
+     app: ordermanagement-admin-composer
+

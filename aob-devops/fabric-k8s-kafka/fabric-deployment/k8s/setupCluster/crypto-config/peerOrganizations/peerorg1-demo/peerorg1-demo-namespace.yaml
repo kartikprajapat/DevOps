@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: peerorg1-demo
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: peerorg1-demo-pv
+spec:
+  capacity:
+    storage: 500Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /crypto-config/peerOrganizations/peerorg1-demo
+    server: fs-f86463b3.efs.us-east-1.amazonaws.com
+  storageClassName: aws-efs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ namespace: peerorg1-demo
+ name: peerorg1-demo-pv
+ annotations:
+  volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+ accessModes:
+   - ReadWriteMany
+ resources:
+   requests:
+     storage: 10Mi
+
+---

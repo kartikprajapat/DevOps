@@ -1,0 +1,60 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: erplab-admin-composer
+  labels:
+    app: erplab-admin-composer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: erplab-admin-composer
+  template:
+    metadata:
+      labels:
+        app: erplab-admin-composer
+    spec:
+      containers:
+      - name: erplab-admin-composer
+        image: 13.127.243.52:5000/aob-rest-composer:0.20.4
+        resources:
+          requests:
+            memory: "700Mi"
+            cpu: "100m"
+          limits:
+            memory: "700Mi"
+            cpu: "100m"
+        ports:
+        - containerPort: 3000
+        env:
+        - name: COMPOSER_CARD
+          value: "erplabadmin@aob-labs"
+        - name: COMPOSER_NAMESPACES
+          value: "never"
+        - name: COMPOSER_DATASOURCES
+          value: '{"db": { "database": "erplab","connector": "mongodb","host": "erp-dev-mongo.aob-erp-private.local","port": "27017"} }'
+        volumeMounts:
+        - mountPath: /home/composer/.composer/
+          name: card-data
+      volumes:
+      - name: card-data
+        persistentVolumeClaim:
+            claimName: card-data
+
+        
+      
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: erplab-admin-composer
+spec:
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+    nodePort: 31010
+  selector:
+     app: erplab-admin-composer

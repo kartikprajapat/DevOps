@@ -1,0 +1,68 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: stemcell-rest-composer
+  labels:
+    app: stemcell-rest-composer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stemcell-rest-composer
+  template:
+    metadata:
+      labels:
+        app: stemcell-rest-composer
+    spec:
+      containers:
+      - name: stemcell-rest-composer
+        image: 13.127.243.52:5000/aob-rest-composer:0.19.14
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "500m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        env:
+        - name: COMPOSER_CARD
+          value: "ankit@stem-cells"
+        - name: COMPOSER_NAMESPACES
+          value: "never"
+        - name: COMPOSER_AUTHENTICATION
+          value: "true"
+        - name: COMPOSER_MULTIUSER
+          value: "true"
+        - name: COMPOSER_PROVIDERS
+          value: '{ "jwt": { "provider": "jwt", "module": "/home/composer/node_modules/custom-jwt.js", "secretOrKey": "-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAwf5XVsvd+umVFh3dP73z+K/Aw87k5oTE7emziF9iYeOTBPptarnC\n8ZFDgXLOMS1uLHLBGvh+mJC9Fz8R9nFeJCok6hhLE5rOZrJAYqq1AZOC62+fMBRK\n0lqm6LMu2zI4r6d7TlIPbEBNLc8rYH1ZqLO53EYHKywZdXmwaufMujfsf6WmWW3f\nzTSrJoUj0K86XutxMFr+dWOjotl+LX2ZDpgYx3Kl6d7mZARGeCFk4Tlj0hwfswYC\nIgbAvTrop+prYofizhE/qBtlYJWnOo1a5CDxHadcxWFtQaVJUUBGfdKambc8w5ke\n41w8EajdtFCN01zy49azTqO9nSBhzUajBwIDAQAB\n-----END RSA PUBLIC KEY-----\n","authScheme": "saml","successRedirect": "/","failureRedirect":"/"} }'
+        - name: COMPOSER_DATASOURCES
+          value: '{ "db": { "database": "stemcell", "connector": "mongodb", "host": "173.0.1.231", "port": "26935"} }'
+
+        volumeMounts:
+        - mountPath: /home/composer/.composer/
+          name: composer-data
+      volumes:
+      - name: composer-data
+        hostPath:
+          path: /home/composer/.composer
+
+        
+      
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: stemcell-rest-composer
+spec:
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+    nodePort: 31008
+  selector:
+     app: stemcell-rest-composer

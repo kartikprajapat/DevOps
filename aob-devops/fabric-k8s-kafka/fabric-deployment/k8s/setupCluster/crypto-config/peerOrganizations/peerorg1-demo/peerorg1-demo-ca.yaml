@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: d-2zec1lmnswzmw6wvbf78
+spec:
+  capacity:
+    storage: 1G
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /
+    server: fs-f86463b3.efs.us-east-1.amazonaws.com
+  storageClassName: aws-efs
+  flexVolume:
+    driver: "alicloud/disk"
+    fsType: "ext4"
+    options:
+      volumeId: "d-2zec1lmnswzmw6wvbf78"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ namespace: peerorg1-demo
+ name: d-2zec1lmnswzmw6wvbf78
+ annotations:
+  volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+ accessModes:
+   - ReadWriteMany
+ resources:
+   requests:
+     storage: 1G
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: peerorg1-demo
+  name: ca
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+       app: hyperledger
+       role: ca
+       org: peerorg1-demo
+       name: ca
+    spec:
+     affinity:
+       podAntiAffinity:
+         requiredDuringSchedulingIgnoredDuringExecution:
+         - labelSelector:
+             matchExpressions:
+             - key: "role"
+               operator: In
+               values:
+               - ca
+           topologyKey: "kubernetes.io/hostname"
+       podAffinity:
+         preferredDuringSchedulingIgnoredDuringExecution:
+         - weight: 100
+           podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: "role"
+                  operator: In
+                  values:
+                  - peer
+                - key: "org"
+                  operator: In
+                  values:
+                  - peerorg1-demo
+              topologyKey: "kubernetes.io/hostname"
+     containers:
+       - name: ca
+         image: hyperledger/fabric-ca:x86_64-1.1.0-preview
+         env:
+         - name:  FABRIC_CA_HOME
+           value: /etc/hyperledger/fabric-ca-server
+         - name:  FABRIC_CA_SERVER_CA_NAME
+           value: ca
+         - name:  FABRIC_CA_SERVER_TLS_ENABLED
+           value: "true"
+         - name:  FABRIC_CA_SERVER_TLS_CERTFILE
+           value: /etc/hyperledger/fabric-ca-server-config/ca/ca.peerorg1-demo-cert.pem
+         - name:  FABRIC_CA_SERVER_TLS_KEYFILE
+           value: /etc/hyperledger/fabric-ca-server-config/ca/cf02d8b3329c73e82561b36fb81a4fd17a5dc609fd1ebb3a0a4a63bce935c428_sk
+         - name: aliyun_logs_fluentd
+           value: "stdout"
+         ports:
+          - containerPort: 7054
+         command: ["sh"]
+         args:  ["-c", " fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca/ca.peerorg1-demo-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/ca/cf02d8b3329c73e82561b36fb81a4fd17a5dc609fd1ebb3a0a4a63bce935c428_sk -b admin:adminpw -d "]
+         volumeMounts:
+          - mountPath: /etc/hyperledger/fabric-ca-server-config/ca
+            name: certificate
+            subPath: ca/
+          - mountPath: /etc/hyperledger/fabric-ca-server
+            name: data
+            subPath: ca
+     volumes:
+       - name: certificate
+         persistentVolumeClaim:
+             claimName: peerorg1-demo-pv
+       - name: data
+         persistentVolumeClaim:
+             claimName: d-2zec1lmnswzmw6wvbf78
+
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+   namespace: peerorg1-demo
+   name: ca
+spec:
+ selector:
+   app: hyperledger
+   role: ca
+   org: peerorg1-demo
+   name: ca
+ clusterIP: None
+ ports:
+   - name: endpoint
+     protocol: TCP
+     port: 7054
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+   namespace: peerorg1-demo
+   name: ca-ex
+spec:
+ selector:
+   app: hyperledger
+   role: ca
+   org: peerorg1-demo
+   name: ca
+ type: NodePort
+ ports:
+   - name: endpoint
+     protocol: TCP
+     port: 7054
+     targetPort: 7054
+     nodePort: 30595
+

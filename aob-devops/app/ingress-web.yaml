@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-web
+  labels:
+    app: web
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: stemcell-web
+          servicePort: 80
