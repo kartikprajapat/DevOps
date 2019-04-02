@@ -1,0 +1,23 @@
+https://www.tecmint.com/configure-zabbix-to-send-email-alerts-to-gmail/
+
+sudo apt-get install ssmtp mailutils
+
+
+vi /etc/ssmtp/ssmtp.conf
+
+root=gmail-username@gmail.com
+mailhub=smtp.gmail.com:587
+rewriteDomain=your_local_domain
+hostname=your_local_FQDN
+UseTLS=Yes
+UseSTARTTLS=Yes
+AuthUser=Gmail_username
+AuthPass=Gmail_password
+FromLineOverride=YES
+
+
+
+echo "Body test email from 'hostname -f' "| mail -s "subject here" gmail_user@gmail.com
+
+
+
